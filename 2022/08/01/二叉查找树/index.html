@@ -1,0 +1,539 @@
+<!DOCTYPE html><html lang="zh-CN," data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>二叉查找树 | yukiyama</title><meta name="author" content="yukiyama,iyukiyama@outlook.com"><meta name="copyright" content="yukiyama"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="二叉查找树 (树ADT连载 3&#x2F;13)  可在作者的 github仓库 中获取本文和其他文章的 markdown 源文件及相关代码。  欢迎评论或仓库 PR 指出文章错漏或与我讨论相关问题，我将长期维护所有文章。  所有文章均用 Typora 完成写作，可使用 Typora 打开文章 md 文件，以获得最佳阅读体验。    🌲🌲🌲 一起手写一棵完整的二叉查找树。 ❗️ 【NEW】">
+<meta property="og:type" content="article">
+<meta property="og:title" content="二叉查找树">
+<meta property="og:url" content="https://iyukiyama.github.io/2022/08/01/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91/index.html">
+<meta property="og:site_name" content="yukiyama">
+<meta property="og:description" content="二叉查找树 (树ADT连载 3&#x2F;13)  可在作者的 github仓库 中获取本文和其他文章的 markdown 源文件及相关代码。  欢迎评论或仓库 PR 指出文章错漏或与我讨论相关问题，我将长期维护所有文章。  所有文章均用 Typora 完成写作，可使用 Typora 打开文章 md 文件，以获得最佳阅读体验。    🌲🌲🌲 一起手写一棵完整的二叉查找树。 ❗️ 【NEW】">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-08-01T13:35:09.237Z">
+<meta property="article:modified_time" content="2022-11-11T06:02:03.631Z">
+<meta property="article:author" content="yukiyama">
+<meta name="twitter:card" content="summary"><link rel="shortcut icon" href="/img/logo.svg"><link rel="canonical" href="https://iyukiyama.github.io/2022/08/01/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":500},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '二叉查找树',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-11-11 14:02:03'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-chart-simple"></i><span> 算法</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/2022/06/07/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E7%9D%A1/"><span> 二分查找</span></a></li><li><a class="site-page child" href="/2022/06/08/%E5%8D%81%E5%A4%A7%E6%8E%92%E5%BA%8F%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E8%B5%98/"><span> 十大排序</span></a></li><li><a class="site-page child" href="/2022/06/10/%E5%B9%B6%E6%9F%A5%E9%9B%86%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%87%BA%E9%97%A8/"><span> 并查集</span></a></li><li><a class="site-page child" href="/2022/06/15/%E5%9B%BE%E8%AE%BA%E7%AE%97%E6%B3%95%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E4%B8%8B/"><span> 图论算法</span></a></li><li><a class="site-page child" href="/2022/08/01/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91/"><span> 二叉查找树</span></a></li><li><a class="site-page child" href="/2022/08/17/AVL%E6%A0%91/"><span> AVL树</span></a></li><li><a class="site-page child" href="/2022/08/17/splay%E6%A0%91/"><span> splay树</span></a></li><li><a class="site-page child" href="/2022/07/26/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E4%B8%8B%E8%BD%A6/"><span> 树状数组</span></a></li><li><a class="site-page child" href="/2022/07/26/%E7%BA%BF%E6%AE%B5%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%80%A5%E5%81%9C/"><span> 线段树</span></a></li><li><a class="site-page child" href="/2022/09/14/%E7%BA%A2%E9%BB%91%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%9C%8B%E5%BC%80/"><span> 红黑树</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-mug-saucer"></i><span> Java</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/_posts/test"><span> test</span></a></li><li><a class="site-page child" href="/spring5/"><span> Spring Framework</span></a></li><li><a class="site-page child" href="/springmvc/"><span> SpringMVC</span></a></li><li><a class="site-page child" href="/springboot/"><span> SpringBoot</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/2022/09/01/git%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/"><i class="fa-fw fas fa-code-branch"></i><span> Git</span></a></div><div class="menus_item"><a class="site-page" href="/2022/08/31/Maven%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/"><i class="fa-fw fas fa-feather"></i><span> Maven</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">yukiyama</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-chart-simple"></i><span> 算法</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/2022/06/07/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E7%9D%A1/"><span> 二分查找</span></a></li><li><a class="site-page child" href="/2022/06/08/%E5%8D%81%E5%A4%A7%E6%8E%92%E5%BA%8F%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E8%B5%98/"><span> 十大排序</span></a></li><li><a class="site-page child" href="/2022/06/10/%E5%B9%B6%E6%9F%A5%E9%9B%86%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%87%BA%E9%97%A8/"><span> 并查集</span></a></li><li><a class="site-page child" href="/2022/06/15/%E5%9B%BE%E8%AE%BA%E7%AE%97%E6%B3%95%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E4%B8%8B/"><span> 图论算法</span></a></li><li><a class="site-page child" href="/2022/08/01/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91/"><span> 二叉查找树</span></a></li><li><a class="site-page child" href="/2022/08/17/AVL%E6%A0%91/"><span> AVL树</span></a></li><li><a class="site-page child" href="/2022/08/17/splay%E6%A0%91/"><span> splay树</span></a></li><li><a class="site-page child" href="/2022/07/26/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E4%B8%8B%E8%BD%A6/"><span> 树状数组</span></a></li><li><a class="site-page child" href="/2022/07/26/%E7%BA%BF%E6%AE%B5%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%80%A5%E5%81%9C/"><span> 线段树</span></a></li><li><a class="site-page child" href="/2022/09/14/%E7%BA%A2%E9%BB%91%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%9C%8B%E5%BC%80/"><span> 红黑树</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-mug-saucer"></i><span> Java</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/_posts/test"><span> test</span></a></li><li><a class="site-page child" href="/spring5/"><span> Spring Framework</span></a></li><li><a class="site-page child" href="/springmvc/"><span> SpringMVC</span></a></li><li><a class="site-page child" href="/springboot/"><span> SpringBoot</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/2022/09/01/git%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/"><i class="fa-fw fas fa-code-branch"></i><span> Git</span></a></div><div class="menus_item"><a class="site-page" href="/2022/08/31/Maven%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/"><i class="fa-fw fas fa-feather"></i><span> Maven</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于我</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">二叉查找树</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-08-01T13:35:09.237Z" title="Created 2022-08-01 21:35:09">2022-08-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2022-11-11T06:02:03.631Z" title="Updated 2022-11-11 14:02:03">2022-11-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">算法与数据结构</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="二叉查找树"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="二叉查找树-树ADT连载-3-x2F-13"><a href="#二叉查找树-树ADT连载-3-x2F-13" class="headerlink" title="二叉查找树 (树ADT连载 3&#x2F;13)"></a>二叉查找树 (树ADT连载 3&#x2F;13)</h1><blockquote>
+<ul>
+<li><p>可在作者的 <a target="_blank" rel="noopener" href="https://github.com/iyukiyama/leetcode-posts">github仓库</a> 中获取本文和其他文章的 markdown 源文件及相关代码。</p>
+</li>
+<li><p>欢迎评论或仓库 PR 指出文章错漏或与我讨论相关问题，我将长期维护所有文章。</p>
+</li>
+<li><p>所有文章均用 Typora 完成写作，可使用 Typora 打开文章 md 文件，以获得最佳阅读体验。</p>
+</li>
+</ul>
+</blockquote>
+<p>🌲🌲🌲 <strong>一起手写一棵完整的二叉查找树。</strong></p>
+<p>❗️ <strong>【NEW】</strong> ❗️</p>
+<ul>
+<li>9-15:  <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/SwgIJV/">红黑树从入门到看开</a></li>
+</ul>
+<p>这是小白 yuki 推出的「树ADT」系列文章的第 3 篇 (3&#x2F;13) 。</p>
+<hr>
+<p>实际上本文是为了后续讲解多种 <strong>平衡二叉树</strong> 的前置文章，最终目的是讲解 <strong>「红黑树」</strong> (已推出，<a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/SwgIJV/">红黑树从入门到看开</a>)。</p>
+<p>本文重点在于展现如何设计一个 BST 类，分析主要方法的代码实现，并给出该类的完整实现代码。读者学习之后 <strong>可以自己写出一个方法较为完备的基本 BST 类</strong> 。</p>
+<hr>
+<p>yuki的其他文章如下，欢迎阅读指正！</p>
+<blockquote>
+<p>如下所有文章同时也在我的 github <a target="_blank" rel="noopener" href="https://github.com/iyukiyama/leetcode-posts">仓库</a> 中维护。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>文章</th>
+<th>[发布时间] 字数&#x2F;览&#x2F;藏&#x2F;赞 (~2022-10-20)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/eBo9UB/">十大排序从入门到入赘</a>  🔥🔥🔥</td>
+<td>[20220516]  2.5万字&#x2F;64.8k览&#x2F;3.7k藏&#x2F;937赞</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/ooxfo8/">二分查找从入门到入睡</a> 🔥🔥🔥</td>
+<td>[20220509]  2.3万字&#x2F;38.4k览&#x2F;2.1k藏&#x2F;503赞</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/qmjuMW/">并查集从入门到出门</a> 🔥🔥</td>
+<td>[20220514]  1.2万字&#x2F;17.9k览&#x2F;1.0k藏&#x2F;321赞</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/FyPTTM/">图论算法从入门到放下</a> 🔥🔥</td>
+<td>[20220617]  5.6万字&#x2F;19.9k览&#x2F;1.3k藏&#x2F;365赞</td>
+</tr>
+<tr>
+<td>树ADT系列 (预计13篇)</td>
+<td>系列文章，连载中</td>
+</tr>
+<tr>
+<td>3. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/wPzlSb/">二叉查找树</a></td>
+<td>[20220801]  5千字</td>
+</tr>
+<tr>
+<td>4. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/zbwD3p/">AVL树</a></td>
+<td>[20220817]  5千字</td>
+</tr>
+<tr>
+<td>5. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/BCK17f/">splay树</a></td>
+<td>[20220817]  5千字</td>
+</tr>
+<tr>
+<td>6. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/SwgIJV/">红黑树从入门到看开</a> 🔥🤯🤯🤯</td>
+<td>[20220915]  3万字&#x2F;5.3k览&#x2F;269藏&#x2F;72赞</td>
+</tr>
+<tr>
+<td>10. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/qGREiN/">树状数组从入门到下车</a> 🔥🤯</td>
+<td>[20220722]  1.4万字&#x2F;5.8k览&#x2F;196藏&#x2F;72赞</td>
+</tr>
+<tr>
+<td>11. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/H4aMOn/">线段树从入门到急停</a> 🔥🤯</td>
+<td>[20220726]  2.5万字&#x2F;8.7k览&#x2F;481藏&#x2F;138赞</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/GV0JrV/">图论相关证明系列</a></td>
+<td>系列文章</td>
+</tr>
+<tr>
+<td>1. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/jJQn7V/">Dijkstra正确性证明</a> 🤯</td>
+<td>[20220531]</td>
+</tr>
+<tr>
+<td>2. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/VVEc8f/">Prim正确性证明</a> 🤯</td>
+<td>[20220919]</td>
+</tr>
+<tr>
+<td>3. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/xeEwYl/">Bellman-Ford及SPFA正确性证明</a></td>
+<td>[20220602]</td>
+</tr>
+<tr>
+<td>4. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/Nbzix4/">Floyd正确性证明</a></td>
+<td>[20220602]</td>
+</tr>
+<tr>
+<td>5. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/tMIy36/">最大流最小割定理证明</a> 🤯🤯</td>
+<td>[20220719]</td>
+</tr>
+<tr>
+<td>6. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/tN3sZc/">Edmonds-Karp复杂度证明</a> 🤯🤯</td>
+<td>[20220515]</td>
+</tr>
+<tr>
+<td>7. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/T9Xa1R/">Dinic复杂度证明</a> 🤯🤯</td>
+<td>[20220531]</td>
+</tr>
+</tbody></table>
+<hr>
+<p>[TOC]</p>
+<hr>
+<h2 id="二叉查找树"><a href="#二叉查找树" class="headerlink" title="二叉查找树"></a>二叉查找树</h2><p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Binary_search_tree">二叉查找树 &#x2F; 二叉搜索树 &#x2F; 二叉排序树 (Binary Search Tree &#x2F; Binary Sort Tree, BST) </a>: 对于一棵二叉树，每个结点存有一个可用于比较的数据项，规定结点 $x$ 的左子树中所有结点的数据项小于 $x$ 的数据项，而 $x$ 的右子树中所有结点的数据项大于 $x$ 的数据项，这样的二叉树即为二叉查找树。对于有 $n$ 个元素的二叉树，假设树高平衡，则根据前面的性质可知其高度为 $logn$ ，我们将能够通过其结点数据项有序的特点，以类似二分查找的树上的 <strong>二分操作</strong> 实现 $O(logn)$ 平均时间复杂度的插入，查找和删除等操作。BST 内容非常丰富，下面我们先介绍非自平衡的 <strong>基本 BST</strong> ，由于基本BST树高不保证平衡，树上操作的复杂度无法保证为 $O(logn)$ ，因此引入 <strong>平衡 BST</strong> 。我们将会详细几种不同的平衡 BST 实现。</p>
+<p>根据定义可知下图中只有左侧的树是 BST ，右侧的树中结点 7 与 6 不满足 BST 的结点顺序性质，若结点 7 是结点 8 的左子结点，则为 BST。</p>
+<p><img src="https://pic.leetcode-cn.com/1656840556-GvQFIZ-image.png" alt="image.png"></p>
+<p>※ 应用二叉查找树实现的数据结构一般为 $set$ 或 $map$，若为 $set$ (例如 Java 中的 $TreeSet$)，则不会存储相同数据项，若为 $map$ (例如 Java 中的 $TreeMap$)，则不会存储相同 $key$ 值。若要求保存相同值，可以采用链表或将相同值看作小于或大于来处理，本文以及后续讲解的所有二叉查找树均不保存相同值。 </p>
+<blockquote>
+<p>根据 Wiki 词条，此数据结构在 1960 年代由多人独立提出。</p>
+<p>The binary search tree algorithm was discovered independently by several researchers, including P.F. Windley, <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Andrew_Donald_Booth">Andrew Donald Booth</a>, <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Andrew_Colin">Andrew Colin</a>, <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Thomas_N._Hibbard">Thomas N. Hibbard</a>. </p>
+</blockquote>
+<br />
+
+<h3 id="基本BST"><a href="#基本BST" class="headerlink" title="基本BST"></a>基本BST</h3><p>基本 BST 即只保持 BST 结点数据项大小关系性质，而不维护树高平衡的 <strong>非平衡 BST</strong> 。所谓「平衡」，指树的形态类似等腰三角形，从根结点到任意叶子结点的路径长度都是稳定的 $O(logn)$ ，更严格的定义是 <strong>「任意结点的左右子树高差不超过 1」</strong> ，如此即能保证对结点的增删改查的时间复杂度均为 $O(logn)$ 。</p>
+<p>基本BST的定义十分简单，我们直接给出它的类的实现架构，并介绍其中的主要方法，然后再分析主要操作的时空复杂度。</p>
+<blockquote>
+<p>本节内容为 Mark Allen Weiss 所著 <a target="_blank" rel="noopener" href="https://awesome-programming-books.github.io/algorithms/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90%EF%BC%9AJava%E8%AF%AD%E8%A8%80%E6%8F%8F%E8%BF%B0.pdf">数据结构与算法分析：Java语言描述</a> 相关章节的整理和总结。代码亦来自该书，略作改动。</p>
+</blockquote>
+<br />
+
+<h4 id="基本BST类架构"><a href="#基本BST类架构" class="headerlink" title="基本BST类架构"></a>基本BST类架构</h4><p>以下是基本 BST 类 ($MyTreeSet$) 架构。</p>
+<table>
+<thead>
+<tr>
+<th>类成员&#x2F;方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>private Node&lt;E&gt; root</code></td>
+<td>唯一字段，根结点</td>
+</tr>
+<tr>
+<td><code>public MyTreeSet()</code></td>
+<td>无参构造器</td>
+</tr>
+<tr>
+<td><code>public void clear()</code></td>
+<td>树置空</td>
+</tr>
+<tr>
+<td><code>public boolean isEmpty()</code></td>
+<td>树判空</td>
+</tr>
+<tr>
+<td><code>public void add(E e)</code></td>
+<td>插入结点驱动方法</td>
+</tr>
+<tr>
+<td><code>public void remove(E e)</code></td>
+<td>删除结点驱动方法</td>
+</tr>
+<tr>
+<td><code>public E first()</code></td>
+<td>查找最小结点驱动方法</td>
+</tr>
+<tr>
+<td><code>public E last()</code></td>
+<td>查找最大结点驱动方法</td>
+</tr>
+<tr>
+<td><code>public E floor(E e)</code></td>
+<td>查找小于等于 $e$ 的最大元素驱动方法</td>
+</tr>
+<tr>
+<td><code>public E ceiling(E e)</code></td>
+<td>查找大于等于 $e$ 的最小元素驱动方法</td>
+</tr>
+<tr>
+<td><code>public E lower(E e)</code></td>
+<td>查找严格小于 $e$ 的最大元素驱动方法</td>
+</tr>
+<tr>
+<td><code>public E higher(E e)</code></td>
+<td>查找严格大于 $e$ 的最小元素驱动方法</td>
+</tr>
+<tr>
+<td><code>public boolean contains(E e)</code></td>
+<td>结点存在判定驱动方法</td>
+</tr>
+<tr>
+<td><code>public void printTree()</code></td>
+<td>中序遍历打印树的驱动方法</td>
+</tr>
+<tr>
+<td><code>public int size()</code></td>
+<td>求树大小驱动方法</td>
+</tr>
+<tr>
+<td><code>public int height()</code></td>
+<td>求树高驱动方法</td>
+</tr>
+<tr>
+<td><code>private Node&lt;E&gt; add(E e, Node&lt;E&gt; t)</code></td>
+<td>插入结点</td>
+</tr>
+<tr>
+<td><code>private Node&lt;E&gt; remove(E e, Node&lt;E&gt; t)</code></td>
+<td>删除结点(懒惰删除)</td>
+</tr>
+<tr>
+<td><code>private Node&lt;E&gt; first(Node&lt;E&gt; t)</code></td>
+<td>返回树的最小结点</td>
+</tr>
+<tr>
+<td><code>private Node&lt;E&gt; last(Node&lt;E&gt; t)</code></td>
+<td>返回树的最大结点</td>
+</tr>
+<tr>
+<td><code>private Node floor(Node&lt;E&gt; x, E e)</code></td>
+<td>查找小于等于 $e$ 的最大元素</td>
+</tr>
+<tr>
+<td><code>private Node&lt;E&gt; ceiling(Node&lt;E&gt; x, E e)</code></td>
+<td>查找大于等于 $e$ 的最小元素</td>
+</tr>
+<tr>
+<td><code>private Node lower(Node&lt;E&gt; x, E e)</code></td>
+<td>查找严格小于 $e$ 的最大元素</td>
+</tr>
+<tr>
+<td><code>private Node&lt;E&gt; higher(Node&lt;E&gt; x, E e)</code></td>
+<td>查找严格大于 $e$ 的最小元素</td>
+</tr>
+<tr>
+<td><code>private boolean contains(E e, Node&lt;E&gt; t)</code></td>
+<td>判断树中是否有指定元素的结点</td>
+</tr>
+<tr>
+<td><code>private void printTree(Node&lt;E&gt; t)</code></td>
+<td>中序遍历打印树</td>
+</tr>
+<tr>
+<td><code>private int height(Node&lt;E&gt; t)</code></td>
+<td>求以 $t$ 为根结点的树高</td>
+</tr>
+<tr>
+<td><code>private int size(Node&lt;E&gt; t)</code></td>
+<td>求以 $t$ 为根结点的树大小</td>
+</tr>
+</tbody></table>
+<br />
+
+<p>以下是二叉树结点嵌套类 $Node$ 的架构。</p>
+<table>
+<thead>
+<tr>
+<th>类成员&#x2F;方法</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>public E element</code></td>
+<td>结点数据</td>
+</tr>
+<tr>
+<td><code>public Node&lt;E&gt; left</code></td>
+<td>左子结点</td>
+</tr>
+<tr>
+<td><code>public Node&lt;E&gt; right</code></td>
+<td>右子结点</td>
+</tr>
+<tr>
+<td><code>public Node(E element)</code></td>
+<td>构造器</td>
+</tr>
+<tr>
+<td><code>public Node(E element, Node&lt;E&gt; left, Node&lt;E&gt; right)</code></td>
+<td>构造器</td>
+</tr>
+</tbody></table>
+<br />
+
+<h4 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h4><p>在类架构表格中，我们看到 BST 实现的 $set$ 类 ($MyTreeSet$) 主要应该包含哪些方法，接下来我们讲解这其中的主要方法。其他实现简单的方法在「类的实现代码」中呈现。</p>
+<br />
+
+<h5 id="add"><a href="#add" class="headerlink" title="add"></a>add</h5><p>插入结点操作由插入驱动方和具体插入方法完成，将值为 $e$ 的结点插入到当前二叉树中并使得插入后仍保持查找树性质。递归地比较 $e$ 和当前结点值的大小，最后 $e$ 总能 <strong>作为一个叶子结点</strong> 被插入到满足查找树性质的位置。</p>
+<p>对于具体插入方法，当原树为 $null$ 时返回 <code>Node&lt;&gt;(e,null, null)</code> 给 $root$ ，即数据为 $e$ 的结点作为根结点插入。当原树不为 $null$ 时， <strong>插入后返回原根</strong> 。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(E e)</span> &#123; <span class="comment">// 插入结点驱动方法</span></span><br><span class="line">    root = add(e, root);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> Node&lt;E&gt; <span class="title function_">add</span><span class="params">(E e, Node&lt;E&gt; t)</span>&#123; <span class="comment">// 插入结点</span></span><br><span class="line">    <span class="keyword">if</span>(t == <span class="literal">null</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Node</span>&lt;&gt;(e,<span class="literal">null</span>, <span class="literal">null</span>);</span><br><span class="line">    <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(t.element);</span><br><span class="line">    <span class="keyword">if</span>(cmp &lt; <span class="number">0</span>) t.left = add(e, t.left); <span class="comment">// 递进直到t.left == null</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(cmp &gt; <span class="number">0</span>) t.right = add(e, t.right); <span class="comment">// 递进直到t.right == null</span></span><br><span class="line">    <span class="keyword">return</span> t; <span class="comment">// 等于时不插入(以该树只能存放不同的元素为前提)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br />
+
+<h5 id="remove"><a href="#remove" class="headerlink" title="remove"></a>remove</h5><p>删除结点操作由删除驱动方法和具体删除方法完成，将数据项为 $e$ 的结点删除并使得删除后仍保持查找树性质。</p>
+<p>首先，在驱动方法中执行 $contains(e)$ ，若不存在直接返回，否则删除目标存在，调用具体删除方法，递归地寻找 $element$ 为 $e$ 的结点 $t$ ，对其执行 <strong>懒惰删除</strong> 。删除相比其他操作要复杂一些，以下为找到时结点 $t$ 的两种情形。</p>
+<ul>
+<li>情形1: $t$ 有左右两个子结点。</li>
+<li>情形2: $t$ 有一个或没有子结点。</li>
+</ul>
+<p>情形1时，找到 $t$ 的右子树中最小结点 $min$ ，令 <code>t.element = min.element</code> ，即相当于用 $min$ 替换掉要删除的 $t$ ，然后对右子树执行删除 $min$ 的操作（由于是最小值，故此删除必属于情形 2）。</p>
+<p>情形2时，根据是否有左子结点，执行此语句 <code>t = (t.left != null) ? t.left : t.right</code> 。有左子结点时 <code>t = t.left</code>，即用这个左子结点取代 $t$。没有左子结点时 <code>t = t.right</code>，表示以右子结点取代 $t$（包含右子结点也为空的情形，则此时 <code>t = null</code>）。</p>
+<p>对于具体删除方法，当原树为 $null$ 时返回 $t$ (即 $root$ ) 给 $root$ 。当原树不为 $null$ 时，在删除后递归地返回到当前根给 $root$（例如当树只有根结点，且删除的就是该根时，<code>root = null</code> ）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">remove</span><span class="params">(E e)</span> &#123; <span class="comment">// 删除结点驱动方法</span></span><br><span class="line">    <span class="keyword">if</span> (e == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;argument to remove() is null&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (!contains(e)) <span class="keyword">return</span>; <span class="comment">// 检测删除目标是否存在</span></span><br><span class="line">    root = remove(e, root);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> Node&lt;E&gt; <span class="title function_">remove</span><span class="params">(E e, Node&lt;E&gt; t)</span>&#123; <span class="comment">// 懒惰删除结点</span></span><br><span class="line">    <span class="keyword">if</span>(t == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(t.element);</span><br><span class="line">    <span class="keyword">if</span>(cmp &lt; <span class="number">0</span>) t.left = remove(e, t.left); <span class="comment">// 递归地在左侧寻找</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(cmp &gt; <span class="number">0</span>) t.right = remove(e, t.right); <span class="comment">// 递归地在右侧寻找</span></span><br><span class="line">    <span class="comment">// e等于t.element，分两种情形</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(t.left != <span class="literal">null</span> &amp;&amp; t.right != <span class="literal">null</span>) &#123; <span class="comment">// 情形1：该t的左右子节点均不为null</span></span><br><span class="line">        t.element = first(t.right).element; <span class="comment">// 在右子树中找min</span></span><br><span class="line">        t.right = remove(t.element, t.right); <span class="comment">// 此时min已是t.element，必为情形2</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> t = (t.left != <span class="literal">null</span>) ? t.left : t.right; <span class="comment">// 情形2: 1以外的情形</span></span><br><span class="line">    <span class="keyword">return</span> t;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br />
+
+<h5 id="first-x2F-last"><a href="#first-x2F-last" class="headerlink" title="first&#x2F;last"></a>first&#x2F;last</h5><p>查找具有最小&#x2F;最大数据的结点的操作由驱动方法和具体方法实现。根据 BST 性质一直向左&#x2F;向右寻找即可找到最小&#x2F;最大值。以下以递归方式实现 $first$，以迭代方式实现 $last$ 。这两个方法的实现容易理解，不赘述。如下展示 $first$ 的实现，$last$ 的实现请看「类的实现代码」。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> E <span class="title function_">first</span><span class="params">()</span> &#123; <span class="comment">// 查找最小结点驱动方法</span></span><br><span class="line">    <span class="keyword">if</span>(isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>();</span><br><span class="line">    <span class="keyword">return</span> first(root).element;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> Node&lt;E&gt; <span class="title function_">first</span><span class="params">(Node&lt;E&gt; t)</span>&#123; <span class="comment">// 返回树的最小节点(尾递归方式)</span></span><br><span class="line">    <span class="keyword">if</span>(t.left == <span class="literal">null</span>) <span class="keyword">return</span> t;</span><br><span class="line">    <span class="keyword">return</span> first(t.left);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br />
+
+<h5 id="floor-x2F-ceiling"><a href="#floor-x2F-ceiling" class="headerlink" title="floor&#x2F;ceiling"></a>floor&#x2F;ceiling</h5><p>$floor$ 方法用于查找小于等于指定元素中的最大者，$ceiling$ 方法用于查找大于等于指定元素中的最小者，均由驱动方法和具体方法实现。其实现方式也是根据 BST 性质向左&#x2F;向右寻找目标。</p>
+<p>以 $floor$ 为例，说明如下。</p>
+<ol>
+<li><code>if (cmp == 0) return x;</code> 若当前元素 $x$ 与目标元素相等，则 $x$ 即为所求直接返回。</li>
+<li><code>if (cmp &lt; 0) return floor(x.left, e);</code> 若 $e$ 小于当前元素 $x$，说明目标元素在 $x$ 的左子树中，传入 $x.left$ 递归调用 $floor$ 。</li>
+<li><code>Node&lt;E&gt; t = floor(x.right, e);</code> 否则此时 $e$ 大于 $x$ ，在 $x$ 的右子树中找最大者，即为所求。</li>
+</ol>
+<p>如下展示 $floor$ 的实现，$ceiling$ 的实现请看「类的实现代码」。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> E <span class="title function_">floor</span><span class="params">(E e)</span> &#123; <span class="comment">// 查找小于等于 e 的最大元素驱动方法</span></span><br><span class="line">    <span class="keyword">if</span> (e == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;argument to floor() is null&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;calls floor() with empty symbol table&quot;</span>);</span><br><span class="line">    Node&lt;E&gt; x = floor(root, e);</span><br><span class="line">    <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;argument to floor() is too small&quot;</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> x.element;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> Node <span class="title function_">floor</span><span class="params">(Node&lt;E&gt; x, E e)</span> &#123; <span class="comment">// 小于等于 e 中最大者</span></span><br><span class="line">    <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(x.element);</span><br><span class="line">    <span class="keyword">if</span> (cmp == <span class="number">0</span>) <span class="keyword">return</span> x;</span><br><span class="line">    <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>) <span class="keyword">return</span> floor(x.left, e);</span><br><span class="line">    Node&lt;E&gt; t = floor(x.right, e);</span><br><span class="line">    <span class="keyword">if</span> (t != <span class="literal">null</span>) <span class="keyword">return</span> t;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>类似地，$lower$ 方法用于查找严格小于指定元素中的最大者，$higher$ 方法用于查找严格大于指定元素的最小者。二者的实现方式与 $floor&#x2F;ceiling$ 非常类似，只需要将等于的情形与需要递归的情形合写即可，具体请看「类的实现代码」。 </p>
+<br />
+
+<h5 id="contains"><a href="#contains" class="headerlink" title="contains"></a>contains</h5><p>寻找树中是否包含数据项为 $e$ 的结点的操作由相应的驱动方法和具体方法实现。根据二叉查找树的性质以递归方式一直向左&#x2F;向右寻找。找到返回 $true$ ，否则返回 $false$ 。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">contains</span><span class="params">(E e)</span> &#123; <span class="comment">// 判断是否包含值为e的元素的结点的驱动方法</span></span><br><span class="line">    <span class="keyword">return</span> contains(e, root);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="type">boolean</span> <span class="title function_">contains</span><span class="params">(E e, Node&lt;E&gt; t)</span> &#123; <span class="comment">// 判断树中是否有指定元素的节点</span></span><br><span class="line">    <span class="keyword">if</span>(t == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(t.element);</span><br><span class="line">    <span class="keyword">if</span>(cmp &lt; <span class="number">0</span>) <span class="keyword">return</span> contains(e, t.left);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(cmp &gt; <span class="number">0</span>) <span class="keyword">return</span> contains(e, t.right);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br />
+
+<h4 id="时空复杂度"><a href="#时空复杂度" class="headerlink" title="时空复杂度"></a>时空复杂度</h4><p>二叉查找树的平均深度为 $O(logn)$ ，因此上述介绍的主要方法 <strong>平均时间复杂度</strong> 均为 $O(logn)$ 。当树为链状时，退化为链表形式，达到最坏时间复杂度 $O(n)$ 。若方法以递归实现，则空间复杂度取决于递归深度 $O(logn)$ ，若以迭代方式实现则空间复杂度为 $O(1)$ 。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>平均时间</th>
+<th>最坏时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>add&#x2F;remove&#x2F;first&#x2F;last&#x2F;floor&#x2F;ceiling&#x2F;lower&#x2F;higher&#x2F;contains</td>
+<td>$O(logn)$</td>
+<td>$O(n)$</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>BST 平均深度为 $O(logn)$ 的证明见此<a target="_blank" rel="noopener" href="http://luc.devroye.org/devroye_reed_1995_variance_height_random_binary_search_tree.pdf">论文</a>。</p>
+</blockquote>
+<br />
+
+<h4 id="类的实现代码"><a href="#类的实现代码" class="headerlink" title="类的实现代码"></a>类的实现代码</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 二叉查找树类 MyTreeSet</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyTreeSet</span>&lt;E <span class="keyword">extends</span> <span class="title class_">Comparable</span>&lt;? <span class="built_in">super</span> E&gt;&gt;&#123;</span><br><span class="line">    <span class="keyword">private</span> Node&lt;E&gt; root; <span class="comment">// 唯一字段，根节点</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">MyTreeSet</span><span class="params">()</span> &#123;&#125; <span class="comment">// 无参构造器</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">clear</span><span class="params">()</span> &#123; <span class="comment">// 树置空</span></span><br><span class="line">        root = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">isEmpty</span><span class="params">()</span> &#123; <span class="comment">// 判树空</span></span><br><span class="line">        <span class="keyword">return</span> root == <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(E e)</span> &#123; <span class="comment">// 插入结点驱动方法</span></span><br><span class="line">        root = add(e, root);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">remove</span><span class="params">(E e)</span> &#123; <span class="comment">// 删除结点驱动方法</span></span><br><span class="line">        <span class="keyword">if</span> (e == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;argument to remove() is null&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (!contains(e)) <span class="keyword">return</span>; <span class="comment">// 检测删除目标是否存在</span></span><br><span class="line">        root = remove(e, root);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> E <span class="title function_">first</span><span class="params">()</span> &#123; <span class="comment">// 查找最小结点驱动方法</span></span><br><span class="line">        <span class="keyword">if</span>(isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>();</span><br><span class="line">        <span class="keyword">return</span> first(root).element;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> E <span class="title function_">last</span><span class="params">()</span>&#123; <span class="comment">// 查找最大结点驱动方法</span></span><br><span class="line">        <span class="keyword">if</span>(isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>();</span><br><span class="line">        <span class="keyword">return</span> last(root).element;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> E <span class="title function_">floor</span><span class="params">(E e)</span> &#123; <span class="comment">// 查找小于等于 e 的最大元素驱动方法</span></span><br><span class="line">        <span class="keyword">if</span> (e == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;argument to floor() is null&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;calls floor() with empty symbol table&quot;</span>);</span><br><span class="line">        Node&lt;E&gt; x = floor(root, e);</span><br><span class="line">        <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;argument to floor() is too small&quot;</span>);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> x.element;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> E <span class="title function_">ceiling</span><span class="params">(E e)</span> &#123; <span class="comment">// 查找大于等于 e 的最小元素驱动方法</span></span><br><span class="line">        <span class="keyword">if</span> (e == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;argument to ceiling() is null&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;calls ceiling() with empty symbol table&quot;</span>);</span><br><span class="line">        Node&lt;E&gt; x = ceiling(root, e);</span><br><span class="line">        <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;argument to ceiling() is too large&quot;</span>);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> x.element;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> E <span class="title function_">lower</span><span class="params">(E e)</span> &#123; <span class="comment">// 查找严格小于 e 的最大元素驱动方法</span></span><br><span class="line">        <span class="keyword">if</span> (e == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;argument to lower() is null&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;calls lower() with empty symbol table&quot;</span>);</span><br><span class="line">        Node&lt;E&gt; x = lower(root, e);</span><br><span class="line">        <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;argument to lower() is too small&quot;</span>);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> x.element;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> E <span class="title function_">higher</span><span class="params">(E e)</span> &#123; <span class="comment">// 查找严格大于 e 的最小元素驱动方法</span></span><br><span class="line">        <span class="keyword">if</span> (e == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;argument to higher() is null&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;calls higher() with empty symbol table&quot;</span>);</span><br><span class="line">        Node&lt;E&gt; x = higher(root, e);</span><br><span class="line">        <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">NoSuchElementException</span>(<span class="string">&quot;argument to higher() is too large&quot;</span>);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> x.element;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">contains</span><span class="params">(E e)</span> &#123; <span class="comment">// 判断是否包含值为e的元素的结点的驱动方法</span></span><br><span class="line">        <span class="keyword">return</span> contains(e, root);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">printTree</span><span class="params">()</span> &#123; <span class="comment">// 中序遍历打印</span></span><br><span class="line">        <span class="keyword">if</span> (isEmpty()) System.out.println(<span class="string">&quot;Empty tree&quot;</span>);</span><br><span class="line">        <span class="keyword">else</span> printTree(root);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">size</span><span class="params">()</span> &#123; <span class="comment">// 求树的个数驱动方法</span></span><br><span class="line">        <span class="keyword">return</span> size(root);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">height</span><span class="params">()</span> &#123; <span class="comment">// 求树的高度驱动方法</span></span><br><span class="line">        <span class="keyword">return</span> height(root);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> Node&lt;E&gt; <span class="title function_">add</span><span class="params">(E e, Node&lt;E&gt; t)</span>&#123; <span class="comment">// 插入结点</span></span><br><span class="line">        <span class="keyword">if</span>(t == <span class="literal">null</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Node</span>&lt;&gt;(e,<span class="literal">null</span>, <span class="literal">null</span>);</span><br><span class="line">        <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(t.element);</span><br><span class="line">        <span class="keyword">if</span>(cmp &lt; <span class="number">0</span>) t.left = add(e, t.left); <span class="comment">// 递进直到t.left == null</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(cmp &gt; <span class="number">0</span>) t.right = add(e, t.right); <span class="comment">// 递进直到t.right == null</span></span><br><span class="line">        <span class="keyword">return</span> t; <span class="comment">// 等于时不插入(以该树只能存放不同的元素为前提)</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> Node&lt;E&gt; <span class="title function_">remove</span><span class="params">(E e, Node&lt;E&gt; t)</span>&#123; <span class="comment">// 懒惰删除结点</span></span><br><span class="line">        <span class="keyword">if</span>(t == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(t.element);</span><br><span class="line">        <span class="keyword">if</span>(cmp &lt; <span class="number">0</span>) t.left = remove(e, t.left); <span class="comment">// 递归地在左侧寻找</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(cmp &gt; <span class="number">0</span>) t.right = remove(e, t.right); <span class="comment">// 递归地在右侧寻找</span></span><br><span class="line">        <span class="comment">// e等于t.element，分两种情形</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(t.left != <span class="literal">null</span> &amp;&amp; t.right != <span class="literal">null</span>) &#123; <span class="comment">// 情形1：该t的左右子节点均不为null</span></span><br><span class="line">            t.element = first(t.right).element; <span class="comment">// 在右子树中找min</span></span><br><span class="line">            t.right = remove(t.element, t.right); <span class="comment">// 此时min已是t.element，必为情形2</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> t = (t.left != <span class="literal">null</span>) ? t.left : t.right; <span class="comment">// 情形2: 1以外的情形</span></span><br><span class="line">        <span class="keyword">return</span> t;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> Node&lt;E&gt; <span class="title function_">first</span><span class="params">(Node&lt;E&gt; t)</span>&#123; <span class="comment">// 返回树的最小节点(尾递归方式)</span></span><br><span class="line">        <span class="keyword">if</span>(t.left == <span class="literal">null</span>) <span class="keyword">return</span> t;</span><br><span class="line">        <span class="keyword">return</span> first(t.left);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> Node&lt;E&gt; <span class="title function_">last</span><span class="params">(Node&lt;E&gt; t)</span>&#123; <span class="comment">// 返回树的最大节点(循环方式)</span></span><br><span class="line">        <span class="keyword">while</span>(t.right != <span class="literal">null</span>) t = t.right;</span><br><span class="line">        <span class="keyword">return</span> t;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">floor</span><span class="params">(Node&lt;E&gt; x, E e)</span> &#123; <span class="comment">// 小于等于 e 中最大者</span></span><br><span class="line">        <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(x.element);</span><br><span class="line">        <span class="keyword">if</span> (cmp == <span class="number">0</span>) <span class="keyword">return</span> x;</span><br><span class="line">        <span class="keyword">if</span> (cmp &lt; <span class="number">0</span>) <span class="keyword">return</span> floor(x.left, e);</span><br><span class="line">        Node&lt;E&gt; t = floor(x.right, e);</span><br><span class="line">        <span class="keyword">if</span> (t != <span class="literal">null</span>) <span class="keyword">return</span> t;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> Node&lt;E&gt; <span class="title function_">ceiling</span><span class="params">(Node&lt;E&gt; x, E e)</span> &#123; <span class="comment">// 大于等于 e 中的最小者</span></span><br><span class="line">        <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(x.element);</span><br><span class="line">        <span class="keyword">if</span> (cmp == <span class="number">0</span>) <span class="keyword">return</span> x;</span><br><span class="line">        <span class="keyword">if</span> (cmp &gt; <span class="number">0</span>)  <span class="keyword">return</span> ceiling(x.right, e);</span><br><span class="line">        Node&lt;E&gt; t = ceiling(x.left, e);</span><br><span class="line">        <span class="keyword">if</span> (t != <span class="literal">null</span>) <span class="keyword">return</span> t;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> Node <span class="title function_">lower</span><span class="params">(Node&lt;E&gt; x, E e)</span> &#123; <span class="comment">// 小于 e 中最大者</span></span><br><span class="line">        <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(x.element);</span><br><span class="line">        <span class="keyword">if</span> (cmp &lt;= <span class="number">0</span>) <span class="keyword">return</span> lower(x.left, e);</span><br><span class="line">        Node&lt;E&gt; t = lower(x.right, e);</span><br><span class="line">        <span class="keyword">if</span> (t != <span class="literal">null</span>) <span class="keyword">return</span> t;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> Node&lt;E&gt; <span class="title function_">higher</span><span class="params">(Node&lt;E&gt; x, E e)</span> &#123; <span class="comment">// 大于 e 中的最小者</span></span><br><span class="line">        <span class="keyword">if</span> (x == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(x.element);</span><br><span class="line">        <span class="keyword">if</span> (cmp &gt;= <span class="number">0</span>)  <span class="keyword">return</span> higher(x.right, e);</span><br><span class="line">        Node&lt;E&gt; t = higher(x.left, e);</span><br><span class="line">        <span class="keyword">if</span> (t != <span class="literal">null</span>) <span class="keyword">return</span> t;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">boolean</span> <span class="title function_">contains</span><span class="params">(E e, Node&lt;E&gt; t)</span> &#123; <span class="comment">// 判断树中是否有指定元素的节点</span></span><br><span class="line">        <span class="keyword">if</span>(t == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">cmp</span> <span class="operator">=</span> e.compareTo(t.element);</span><br><span class="line">        <span class="keyword">if</span>(cmp &lt; <span class="number">0</span>) <span class="keyword">return</span> contains(e, t.left);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(cmp &gt; <span class="number">0</span>) <span class="keyword">return</span> contains(e, t.right);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">printTree</span><span class="params">(Node&lt;E&gt; t)</span> &#123; <span class="comment">// 中序遍历打印树</span></span><br><span class="line">        <span class="keyword">if</span>(t != <span class="literal">null</span>) &#123;</span><br><span class="line">            printTree(t.left);</span><br><span class="line">            System.out.println(t.element);</span><br><span class="line">            printTree(t.right);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="title function_">height</span><span class="params">(Node&lt;E&gt; t)</span> &#123; <span class="comment">// 返回以t为根节点的树的高度</span></span><br><span class="line">        <span class="keyword">if</span>(t == <span class="literal">null</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">return</span> <span class="number">1</span> + Math.max(height(t.left), height(t.right));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="title function_">size</span><span class="params">(Node&lt;E&gt; t)</span> &#123; <span class="comment">// 递归地遍历树的所有节点，返回节点总数</span></span><br><span class="line">        <span class="keyword">if</span>(t != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span>(t.left != <span class="literal">null</span> &amp;&amp; t.right != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span> + size(t.left) + size(t.right);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> t.left != <span class="literal">null</span> ? <span class="number">1</span> + size(t.left) : <span class="number">1</span> + size(t.right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 二叉树节点嵌套类</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Node</span>&lt;E&gt;&#123;</span><br><span class="line">        <span class="keyword">public</span> E element;</span><br><span class="line">        <span class="keyword">public</span> Node&lt;E&gt; left, right;</span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">Node</span><span class="params">(E element, Node&lt;E&gt; left, Node&lt;E&gt; right)</span>&#123;</span><br><span class="line">            <span class="built_in">this</span>.element = element;</span><br><span class="line">            <span class="built_in">this</span>.left = left;</span><br><span class="line">            <span class="built_in">this</span>.right = right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br />
+
+<h4 id="测试代码"><a href="#测试代码" class="headerlink" title="测试代码"></a>测试代码</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yukiyama;</span><br><span class="line"><span class="keyword">import</span> java.util.NoSuchElementException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MyTreeSetDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        MyTreeSet&lt;Integer&gt; t = <span class="keyword">new</span> <span class="title class_">MyTreeSet</span>&lt;&gt;( );</span><br><span class="line">        <span class="comment">// 10 98 61 13 8 20 48 29 47 74</span></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         *            10</span></span><br><span class="line"><span class="comment">         *        8       98</span></span><br><span class="line"><span class="comment">         *             61</span></span><br><span class="line"><span class="comment">         *          13    74</span></span><br><span class="line"><span class="comment">         *            20</span></span><br><span class="line"><span class="comment">         *              48</span></span><br><span class="line"><span class="comment">         *            29</span></span><br><span class="line"><span class="comment">         *              47</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="type">int</span>[] elements = &#123;<span class="number">10</span>,<span class="number">98</span>,<span class="number">61</span>,<span class="number">13</span>,<span class="number">8</span>,<span class="number">20</span>,<span class="number">48</span>,<span class="number">29</span>,<span class="number">47</span>,<span class="number">74</span>&#125;;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> e : elements) t.add(e);</span><br><span class="line">        t.add(<span class="number">10</span>);</span><br><span class="line">        t.printTree(); <span class="comment">// 输出8 10 13 20 29 47 48 61 74 98</span></span><br><span class="line">        System.out.printf(<span class="string">&quot;size: %d, height: %d, min: %d, max: %d\n&quot;</span>, t.size(), t.height(), t.first(), t.last());</span><br><span class="line">        System.out.printf(<span class="string">&quot;has 47? %s, has 100? %s\n&quot;</span>, t.contains(<span class="number">47</span>), t.contains(<span class="number">100</span>));</span><br><span class="line">        System.out.printf(<span class="string">&quot;floor(9): %s, floor(10): %s, ceiling(73): %s, ceiling(98): %s\n&quot;</span>, t.floor(<span class="number">9</span>), t.floor(<span class="number">10</span>), t.ceiling(<span class="number">73</span>), t.ceiling(<span class="number">98</span>));</span><br><span class="line">        System.out.printf(<span class="string">&quot;lower(9): %s, lower(10): %s, higher(73): %s, higher(61): %s\n&quot;</span>, t.lower(<span class="number">9</span>), t.lower(<span class="number">10</span>), t.higher(<span class="number">73</span>), t.higher(<span class="number">61</span>));</span><br><span class="line">        t.remove(<span class="number">47</span>); t.remove(<span class="number">48</span>); t.remove(<span class="number">61</span>);</span><br><span class="line">        t.printTree();</span><br><span class="line">        System.out.println(<span class="string">&quot;is empty: &quot;</span> + t.isEmpty()); <span class="comment">// 输出false</span></span><br><span class="line">        t.clear();</span><br><span class="line">        System.out.println(<span class="string">&quot;is empty: &quot;</span> + t.isEmpty()); <span class="comment">// 输出true</span></span><br><span class="line">        System.out.printf(<span class="string">&quot;size: %d, height: %d\n&quot;</span>, t.size(), t.height());<span class="comment">// 输出0</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br /></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://iyukiyama.github.io">yukiyama</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://iyukiyama.github.io/2022/08/01/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91/">https://iyukiyama.github.io/2022/08/01/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/08/17/AVL%E6%A0%91/"><img class="prev-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">AVL树</div></div></a></div><div class="next-post pull-right"><a href="/2022/07/26/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E4%B8%8B%E8%BD%A6/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">树状数组从入门到下车</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">yukiyama</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/iyukiyama" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:iyukiyama@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91-%E6%A0%91ADT%E8%BF%9E%E8%BD%BD-3-x2F-13"><span class="toc-number">1.</span> <span class="toc-text">二叉查找树 (树ADT连载 3&#x2F;13)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91"><span class="toc-number">1.1.</span> <span class="toc-text">二叉查找树</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E6%9C%ACBST"><span class="toc-number">1.1.1.</span> <span class="toc-text">基本BST</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%ACBST%E7%B1%BB%E6%9E%B6%E6%9E%84"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">基本BST类架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">主要方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#add"><span class="toc-number">1.1.1.2.1.</span> <span class="toc-text">add</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#remove"><span class="toc-number">1.1.1.2.2.</span> <span class="toc-text">remove</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#first-x2F-last"><span class="toc-number">1.1.1.2.3.</span> <span class="toc-text">first&#x2F;last</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#floor-x2F-ceiling"><span class="toc-number">1.1.1.2.4.</span> <span class="toc-text">floor&#x2F;ceiling</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#contains"><span class="toc-number">1.1.1.2.5.</span> <span class="toc-text">contains</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%B6%E7%A9%BA%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">时空复杂度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%B1%BB%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81"><span class="toc-number">1.1.1.4.</span> <span class="toc-text">类的实现代码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="toc-number">1.1.1.5.</span> <span class="toc-text">测试代码</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/09/14/%E7%BA%A2%E9%BB%91%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%9C%8B%E5%BC%80/" title="红黑树从入门到看开"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="红黑树从入门到看开"/></a><div class="content"><a class="title" href="/2022/09/14/%E7%BA%A2%E9%BB%91%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%9C%8B%E5%BC%80/" title="红黑树从入门到看开">红黑树从入门到看开</a><time datetime="2022-09-14T10:32:06.989Z" title="Created 2022-09-14 18:32:06">2022-09-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/09/01/git%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/" title="Git学习实战"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Git学习实战"/></a><div class="content"><a class="title" href="/2022/09/01/git%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/" title="Git学习实战">Git学习实战</a><time datetime="2022-08-31T16:10:22.004Z" title="Created 2022-09-01 00:10:22">2022-09-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/08/31/Maven%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/" title="Maven学习实战"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Maven学习实战"/></a><div class="content"><a class="title" href="/2022/08/31/Maven%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/" title="Maven学习实战">Maven学习实战</a><time datetime="2022-08-31T13:35:23.475Z" title="Created 2022-08-31 21:35:23">2022-08-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/08/17/splay%E6%A0%91/" title="splay树"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="splay树"/></a><div class="content"><a class="title" href="/2022/08/17/splay%E6%A0%91/" title="splay树">splay树</a><time datetime="2022-08-17T03:19:44.141Z" title="Created 2022-08-17 11:19:44">2022-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/08/17/AVL%E6%A0%91/" title="AVL树"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AVL树"/></a><div class="content"><a class="title" href="/2022/08/17/AVL%E6%A0%91/" title="AVL树">AVL树</a><time datetime="2022-08-17T02:57:15.979Z" title="Created 2022-08-17 10:57:15">2022-08-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By yukiyama</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

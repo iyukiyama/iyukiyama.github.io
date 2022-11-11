@@ -1,0 +1,560 @@
+<!DOCTYPE html><html lang="zh-CN," data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>并查集从入门到出门 | yukiyama</title><meta name="author" content="yukiyama,iyukiyama@outlook.com"><meta name="copyright" content="yukiyama"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="今天，就由你来发明并查集  可在作者的 github仓库 中获取本文和其他文章的 markdown 源文件及相关代码。  欢迎评论或仓库 PR 指出文章错漏或与我讨论相关问题，我将长期维护所有文章。  所有文章均用 Typora 完成写作，可使用 Typora 打开文章 md 文件，以获得最佳阅读体验。    ⚠️ ⚠️ ⚠️ 本文较长，正文一万两千字 (不含题解) ，尝试展现如何从零开始发明并查">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并查集从入门到出门">
+<meta property="og:url" content="https://iyukiyama.github.io/2022/06/10/%E5%B9%B6%E6%9F%A5%E9%9B%86%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%87%BA%E9%97%A8/index.html">
+<meta property="og:site_name" content="yukiyama">
+<meta property="og:description" content="今天，就由你来发明并查集  可在作者的 github仓库 中获取本文和其他文章的 markdown 源文件及相关代码。  欢迎评论或仓库 PR 指出文章错漏或与我讨论相关问题，我将长期维护所有文章。  所有文章均用 Typora 完成写作，可使用 Typora 打开文章 md 文件，以获得最佳阅读体验。    ⚠️ ⚠️ ⚠️ 本文较长，正文一万两千字 (不含题解) ，尝试展现如何从零开始发明并查">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-06-10T06:40:21.600Z">
+<meta property="article:modified_time" content="2022-11-11T06:02:55.589Z">
+<meta property="article:author" content="yukiyama">
+<meta name="twitter:card" content="summary"><link rel="shortcut icon" href="/img/logo.svg"><link rel="canonical" href="https://iyukiyama.github.io/2022/06/10/%E5%B9%B6%E6%9F%A5%E9%9B%86%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%87%BA%E9%97%A8/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":500},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '并查集从入门到出门',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-11-11 14:02:55'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-chart-simple"></i><span> 算法</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/2022/06/07/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E7%9D%A1/"><span> 二分查找</span></a></li><li><a class="site-page child" href="/2022/06/08/%E5%8D%81%E5%A4%A7%E6%8E%92%E5%BA%8F%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E8%B5%98/"><span> 十大排序</span></a></li><li><a class="site-page child" href="/2022/06/10/%E5%B9%B6%E6%9F%A5%E9%9B%86%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%87%BA%E9%97%A8/"><span> 并查集</span></a></li><li><a class="site-page child" href="/2022/06/15/%E5%9B%BE%E8%AE%BA%E7%AE%97%E6%B3%95%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E4%B8%8B/"><span> 图论算法</span></a></li><li><a class="site-page child" href="/2022/08/01/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91/"><span> 二叉查找树</span></a></li><li><a class="site-page child" href="/2022/08/17/AVL%E6%A0%91/"><span> AVL树</span></a></li><li><a class="site-page child" href="/2022/08/17/splay%E6%A0%91/"><span> splay树</span></a></li><li><a class="site-page child" href="/2022/07/26/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E4%B8%8B%E8%BD%A6/"><span> 树状数组</span></a></li><li><a class="site-page child" href="/2022/07/26/%E7%BA%BF%E6%AE%B5%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%80%A5%E5%81%9C/"><span> 线段树</span></a></li><li><a class="site-page child" href="/2022/09/14/%E7%BA%A2%E9%BB%91%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%9C%8B%E5%BC%80/"><span> 红黑树</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-mug-saucer"></i><span> Java</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/_posts/test"><span> test</span></a></li><li><a class="site-page child" href="/spring5/"><span> Spring Framework</span></a></li><li><a class="site-page child" href="/springmvc/"><span> SpringMVC</span></a></li><li><a class="site-page child" href="/springboot/"><span> SpringBoot</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/2022/09/01/git%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/"><i class="fa-fw fas fa-code-branch"></i><span> Git</span></a></div><div class="menus_item"><a class="site-page" href="/2022/08/31/Maven%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/"><i class="fa-fw fas fa-feather"></i><span> Maven</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于我</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">yukiyama</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-chart-simple"></i><span> 算法</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/2022/06/07/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E7%9D%A1/"><span> 二分查找</span></a></li><li><a class="site-page child" href="/2022/06/08/%E5%8D%81%E5%A4%A7%E6%8E%92%E5%BA%8F%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E8%B5%98/"><span> 十大排序</span></a></li><li><a class="site-page child" href="/2022/06/10/%E5%B9%B6%E6%9F%A5%E9%9B%86%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%87%BA%E9%97%A8/"><span> 并查集</span></a></li><li><a class="site-page child" href="/2022/06/15/%E5%9B%BE%E8%AE%BA%E7%AE%97%E6%B3%95%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E4%B8%8B/"><span> 图论算法</span></a></li><li><a class="site-page child" href="/2022/08/01/%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91/"><span> 二叉查找树</span></a></li><li><a class="site-page child" href="/2022/08/17/AVL%E6%A0%91/"><span> AVL树</span></a></li><li><a class="site-page child" href="/2022/08/17/splay%E6%A0%91/"><span> splay树</span></a></li><li><a class="site-page child" href="/2022/07/26/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E4%B8%8B%E8%BD%A6/"><span> 树状数组</span></a></li><li><a class="site-page child" href="/2022/07/26/%E7%BA%BF%E6%AE%B5%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%80%A5%E5%81%9C/"><span> 线段树</span></a></li><li><a class="site-page child" href="/2022/09/14/%E7%BA%A2%E9%BB%91%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%9C%8B%E5%BC%80/"><span> 红黑树</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-mug-saucer"></i><span> Java</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/_posts/test"><span> test</span></a></li><li><a class="site-page child" href="/spring5/"><span> Spring Framework</span></a></li><li><a class="site-page child" href="/springmvc/"><span> SpringMVC</span></a></li><li><a class="site-page child" href="/springboot/"><span> SpringBoot</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/2022/09/01/git%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/"><i class="fa-fw fas fa-code-branch"></i><span> Git</span></a></div><div class="menus_item"><a class="site-page" href="/2022/08/31/Maven%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/"><i class="fa-fw fas fa-feather"></i><span> Maven</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 目录</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于我</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">并查集从入门到出门</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-06-10T06:40:21.600Z" title="Created 2022-06-10 14:40:21">2022-06-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2022-11-11T06:02:55.589Z" title="Updated 2022-11-11 14:02:55">2022-11-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%AE%97%E6%B3%95%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">算法与数据结构</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="并查集从入门到出门"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="今天，就由你来发明并查集"><a href="#今天，就由你来发明并查集" class="headerlink" title="今天，就由你来发明并查集"></a>今天，就由你来发明并查集</h1><blockquote>
+<ul>
+<li><p>可在作者的 <a target="_blank" rel="noopener" href="https://github.com/iyukiyama/leetcode-posts">github仓库</a> 中获取本文和其他文章的 markdown 源文件及相关代码。</p>
+</li>
+<li><p>欢迎评论或仓库 PR 指出文章错漏或与我讨论相关问题，我将长期维护所有文章。</p>
+</li>
+<li><p>所有文章均用 Typora 完成写作，可使用 Typora 打开文章 md 文件，以获得最佳阅读体验。</p>
+</li>
+</ul>
+</blockquote>
+<p>⚠️ ⚠️ ⚠️ <strong>本文较长，正文一万两千字 (不含题解) ，尝试展现如何从零开始发明并查集。</strong></p>
+<p>❗️ <strong>【NEW】</strong> ❗️</p>
+<ul>
+<li>9-15:  <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/SwgIJV/">红黑树从入门到看开</a></li>
+</ul>
+<hr>
+<blockquote>
+<p>$keywords$ :</p>
+<p>从零发明并查集 &#x2F; 连通分量 &#x2F; 查询与合并 &#x2F; 按大小求并 &#x2F; 按秩(高度)求并 &#x2F; 路径压缩 &#x2F; 负数技巧 &#x2F; 反阿克曼函数</p>
+</blockquote>
+<p>前几天 (20220509) 在讨论区发了篇文章 <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/ooxfo8/">二分查找从入门到入睡</a> ，得到了蛮不错的反馈，这让我感觉到基础知识的总结和分享很有价值。从前一篇文章的点赞和一些评论中我还发现，虽然我们在力扣上总能看到一些知名 ID 的题解题评，<strong>但像我这样的小白用户才是大多数</strong> ，因此我想尝试多分享一些主要面向小白的，我用心总结过的（也许是微不足道的）心得，于是有了这篇文章。</p>
+<p>并查集以简单高效著称，理解起来并没有太大的难度，但如果只是 <strong>「输入式」</strong> 地学习，初学时总会觉得不够透彻，尤其是 <strong>「路径压缩」</strong> ，以及 <strong>「秩」</strong> 的准确内涵。就好比你知道怎么写 $Dijkstra$ ，但你没有推导过一遍 <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/jJQn7V/">该算法的正确性</a> ，你做起题来就总是不踏实。所以本文尝试以 <strong>「启发式」</strong> 的方式讲解，让初学者真正地从思考一个具体的问题开始，从无到有逐步创造一种数据结构解决之（当然并不是真的从零开始，你得知道链表、树、递归等基础知识）。原本你跟着一般教材，比如我手边的 Weiss 那本 <a target="_blank" rel="noopener" href="https://awesome-programming-books.github.io/algorithms/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90%EF%BC%9AJava%E8%AF%AD%E8%A8%80%E6%8F%8F%E8%BF%B0.pdf">数据结构与算法分析：Java语言描述</a> ，可能需要消化个一两天才能对并查集有掌控感，但我希望通过这篇文章把这个时间压缩到一两个小时之内（毕竟是你在全程发明并查集😄）。对于已经熟悉并查集，甚至是用并查集解决过不少问题的人，这篇文章可能也有一些看点。比如对于如下问题，如果你对自己的答案还有些犹疑的话，可以看看本文。</p>
+<blockquote>
+<p>问题1: 为什么带路径压缩的并查集中基于高度的求并称作「按秩求并」而非「按高度求并」？可否给出严谨的说明？<br>问题2: 求并时比较大小或比较秩，总是通过两棵树的根的大小或秩比较，而且一次只比较两个根，随着合并的进行，根逐渐变少，大小数组或秩数组的大部分空间似乎没用到，你能优化这部分空间吗？</p>
+</blockquote>
+<p>正文部分将从基本概念入手，呈现并查集的基本样貌，包括其适用的 <strong>问题特征</strong> ，<strong>「查询」</strong> 和 <strong>「合并」</strong> 是怎么想到的，如何从「简单查询」和「简单求并」得到的基本并查集中看到优化方向，并实现一个优化后的查询，即 <strong>「带路径压缩的查询」</strong> ，以及两个优化后的求并，即 <strong>「按大小求并」</strong> 和 <strong>「按秩 (高度) 求并」</strong> 。我还会准确地指出 <strong>「秩」的内涵</strong> 以回答上述「问题1」，并在文章末尾介绍一种 <strong>无需大小或秩数组空间的技巧</strong> 以回答上述「问题2」。最后会在「实战应用」中给出十几道题目的并查集解法，以便读者自查。</p>
+<br />
+
+<p><strong>本文标题</strong> 意在表达作者的一种希望，即期待对并查集不太熟悉的你，在看完本文后能够 <strong>完全掌握</strong> 这一数据结构，且能够快速做完相关题目，<strong>出门</strong> 享受这个暮春（写于2022年暮春）。本文曾发布在个人知乎专栏中，也授权一位朋友发表在他自己的公众号上过。但我从读者的角度，以所谓 <strong>「独立发明」并查集</strong> 的视角出发，用一种全新的「冷幽默」写作风格（自封的），几乎重写了一遍。</p>
+<p><strong>为了说得更透彻，文章依旧是话痨风。文中若有疏漏之处，还希望大家不吝赐教，你所指出的文章中的任何错误我都会及时更正。下面我们开始发明并查集的旅程。</strong></p>
+<hr>
+<p>yuki的其他文章如下，欢迎阅读指正！</p>
+<blockquote>
+<p>如下所有文章同时也在我的 github <a target="_blank" rel="noopener" href="https://github.com/iyukiyama/leetcode-posts">仓库</a> 中维护。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>文章</th>
+<th>[发布时间] 字数&#x2F;览&#x2F;藏&#x2F;赞 (~2022-10-20)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/eBo9UB/">十大排序从入门到入赘</a>  🔥🔥🔥</td>
+<td>[20220516]  2.5万字&#x2F;64.8k览&#x2F;3.7k藏&#x2F;937赞</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/ooxfo8/">二分查找从入门到入睡</a> 🔥🔥🔥</td>
+<td>[20220509]  2.3万字&#x2F;38.4k览&#x2F;2.1k藏&#x2F;503赞</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/qmjuMW/">并查集从入门到出门</a> 🔥🔥</td>
+<td>[20220514]  1.2万字&#x2F;17.9k览&#x2F;1.0k藏&#x2F;321赞</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/FyPTTM/">图论算法从入门到放下</a> 🔥🔥</td>
+<td>[20220617]  5.6万字&#x2F;19.9k览&#x2F;1.3k藏&#x2F;365赞</td>
+</tr>
+<tr>
+<td>树ADT系列 (预计13篇)</td>
+<td>系列文章，连载中</td>
+</tr>
+<tr>
+<td>3. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/wPzlSb/">二叉查找树</a></td>
+<td>[20220801]  5千字</td>
+</tr>
+<tr>
+<td>4. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/zbwD3p/">AVL树</a></td>
+<td>[20220817]  5千字</td>
+</tr>
+<tr>
+<td>5. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/BCK17f/">splay树</a></td>
+<td>[20220817]  5千字</td>
+</tr>
+<tr>
+<td>6. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/SwgIJV/">红黑树从入门到看开</a> 🔥🤯🤯🤯</td>
+<td>[20220915]  3万字&#x2F;5.3k览&#x2F;269藏&#x2F;72赞</td>
+</tr>
+<tr>
+<td>10. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/qGREiN/">树状数组从入门到下车</a> 🔥🤯</td>
+<td>[20220722]  1.4万字&#x2F;5.8k览&#x2F;196藏&#x2F;72赞</td>
+</tr>
+<tr>
+<td>11. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/H4aMOn/">线段树从入门到急停</a> 🔥🤯</td>
+<td>[20220726]  2.5万字&#x2F;8.7k览&#x2F;481藏&#x2F;138赞</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/GV0JrV/">图论相关证明系列</a></td>
+<td>系列文章</td>
+</tr>
+<tr>
+<td>1. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/jJQn7V/">Dijkstra正确性证明</a> 🤯</td>
+<td>[20220531]</td>
+</tr>
+<tr>
+<td>2. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/VVEc8f/">Prim正确性证明</a> 🤯</td>
+<td>[20220919]</td>
+</tr>
+<tr>
+<td>3. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/xeEwYl/">Bellman-Ford及SPFA正确性证明</a></td>
+<td>[20220602]</td>
+</tr>
+<tr>
+<td>4. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/Nbzix4/">Floyd正确性证明</a></td>
+<td>[20220602]</td>
+</tr>
+<tr>
+<td>5. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/tMIy36/">最大流最小割定理证明</a> 🤯🤯</td>
+<td>[20220719]</td>
+</tr>
+<tr>
+<td>6. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/tN3sZc/">Edmonds-Karp复杂度证明</a> 🤯🤯</td>
+<td>[20220515]</td>
+</tr>
+<tr>
+<td>7. <a target="_blank" rel="noopener" href="https://leetcode.cn/circle/discuss/T9Xa1R/">Dinic复杂度证明</a> 🤯🤯</td>
+<td>[20220531]</td>
+</tr>
+</tbody></table>
+<hr>
+<p>[2022-07-31]</p>
+<ul>
+<li>更正了「应用负数技巧」的并查集类的「按秩求并」方法的一处逻辑错误。该错误由 <a href="/u/you-lan-r4/">@you-lan-r4</a> (幽蓝) 发现并指出，感谢 🙏 。</li>
+<li>修改了若干词句。</li>
+</ul>
+<hr>
+<p>[TOC]</p>
+<hr>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>我们以一个直观的问题引入并查集 (不相交集) 的概念。</p>
+<p>※ 并查集: Union-Find Set ，不相交集: Disjoint Set。</p>
+<blockquote>
+<p><strong>亲戚问题：</strong> 有一群人，他们属于不同家族，同一个家族里的人互为亲戚，不同家族的人不是亲戚。已知每个人都知道自己与其他人是否有亲戚关系，求问有几个家族。</p>
+</blockquote>
+<p>亲戚问题代表着一大类能用并查集解决的所谓确定「<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Connected_component">连通分量</a>」的问题，可以将上述问题图示化如下，不同颜色的集合代表不同家族，集合内的人 (元素) 互为亲戚。从图论的角度来说，同一个集合内的元素是相互「连通」的，那么一个集合就是一个「连通分量」。用集合的语言来说，问题涉及的元素可划归到互相 <strong>没有交集</strong> 的集合，因此也称这样的结构为 <strong>「不相交集」</strong> 。</p>
+<p><img src="https://pic.leetcode-cn.com/1652515794-TUjgDZ-image.png" alt="image.png"></p>
+<p>于是我们可以这样概括性地描述并查集：</p>
+<blockquote>
+<p>并查集 (不相交集) 是一种描述不相交集合的数据结构，即若一个问题涉及多个元素，它们可划归到不同集合，同属一个集合内的元素等价（即可用任意一个元素作为代表，比如上述的互为亲戚即互相等价），不同集合内的元素不等价。</p>
+</blockquote>
+<p>这基本上就是对并查集的完整描述了，十分简单。问题涉及的元素初始时总是自己构成一个单元素集合，求解问题需要通过合并操作将等价元素归入一个集合中。为了能够合并等价元素，我们必须查询希望合并的对象元素属于哪个集合，以决定是否要执行合并。因此 <strong>主要操作就是「查询」与「合并」</strong>  (注意，此刻我们当然还不知道如何查询如何求并，但并不妨碍我们看出这两个操作的必要性) 。</p>
+<p>「不相交」描述的是问题元素构成集合之后各个集合不相交的状态，「并查」描述的是处理问题时的操作。后文中两种称呼都会出现。</p>
+<p>上面的亲戚问题只用于引入并查集的概念，而本文剩下的内容，会以 <a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-provinces/">547: 省份数量</a> 问题为研究对象，一步步 <strong>发明并查集</strong> 以解决该问题。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">LeetCode 547. 省份数量</span><br><span class="line">有 n 个城市，其中一些彼此相连，另一些没有相连。如果城市 a 与城市 b 直接相连，且城市 b 与城市 c 直接相连，那么城市 a 与城市 c 间接相连。</span><br><span class="line">省份是一组直接或间接相连的城市，组内不含其他没有相连的城市。</span><br><span class="line">给你一个 n x n 的矩阵 isConnected ，其中 isConnected[i][j] = 1 表示第 i 个城市和第 j 个城市直接相连，而 isConnected[i][j] = 0 表示二者不直接相连。</span><br><span class="line">返回矩阵中 省份 的数量。</span><br><span class="line">示例1:</span><br><span class="line">输入：isConnected = [[1,1,0],[1,1,0],[0,0,1]]</span><br><span class="line">输出：2</span><br><span class="line">示例2</span><br><span class="line">输入：isConnected = [[1,0,0],[0,1,0],[0,0,1]]</span><br><span class="line">输出：3</span><br></pre></td></tr></table></figure>
+
+<p>不难看出这是一个典型的并查集问题。如果我们能够通过矩阵信息将同一省份的城市都加入到同一个集合，最终有多少个省份就会有多少个不相交集合。</p>
+<p>从现在开始，行文视角换成正在读本文的你。对于上述问题，你在草稿纸上稍作勾画，写下了如下处理过程 (draft版)：</p>
+<ol>
+<li><p>初始时，每个城市是否与其他城市同属一省是未知的，此时每个城市构成单元素集合。</p>
+</li>
+<li><p>为了知道哪些城市同属一省，需要遍历矩阵，若 $(i, j)$ 为 1，说明 $i, j$ 两个城市同属一省，可以合并在一起，得到一个 2 元素集合。在集合扩大的过程中，需要找到一个代表，以便多元素集合之间的合并。即当询问 $i$ 与 $j$ 是否应当合并时，需先确定 $i$ 和 $j$ 各自的代表，若相同，那么她们在之前就已经通过其他城市合并在一起了，若不同，则合并之，即向其中一个城市宣告它的代表，使她可以知道自己属于哪个省。现在，「查询」与「合并」变得更具体了。</p>
+</li>
+<li><p>对未确定归属的城市进行上述的查询合并操作，当结束矩阵遍历时，所有城市就都知道了自己的代表。此时再遍历一遍所有城市，「查询」她们的代表，有多少个不同的代表，就有多少个不同的省份，于是问题得到解决。</p>
+</li>
+</ol>
+<p>通过上述对处理过程的思考，你发现 <strong>「代表」</strong> 在这一过程中至关重要，且所谓「同属一省的城市 (形成了集合) 」并不是静态的将这些城市放在了一起（放到表中或者其他什么静态的数据结构中），而是 <strong>动态地</strong> 查询它们的代表才知道的。一个迫切要解决的问题就是如何保存及表示「代表」。再回顾一遍查询操作，假设集合中的某个元素 (省会城市) $x$ 为该集合的代表，查询城市 $y$ 是否属于 $x$ 所在的省时，虽然不能直接得知这一信息，但 $y$ 可能知道自己与其他城市是否在同一省，而这个其他城市又知道自己与 $x$ 在同一省，或者经过「若干跳」来追溯到 $x$ ，那么你就能够知道 $y$ 与 $x$ 为同一省。这种向着一个方向串联的关系使你立刻想到以 <strong>(单向) 链表</strong> 来实现 (这是你的独创，虽然后面你会知道用树的概念更合适，但谁让你现在还 <strong>一无所知</strong> 呢)。于是你将每个城市想象成单向链表中的一个结点，以尾节点 (省会城市) 作为代表，每个元素 (城市) 指向它的后继 (通过矩阵中的 1 得知) ，连续地向 $next$ 查询，一定能查询到尾结点。查询两个节点元素的尾结点是否相同，即可知道他们是否属于同一集合。你有了「查询」的感觉，并且当你思考「合并」操作时，也隐隐感觉到也许可以通过改变链表指针来实现，但你还不确定。</p>
+<p>总之，你勾勒出了并查集处理问题的主要过程为： <strong>初始化 (单元素集合) 、合并和查询</strong> 。不待稍歇，你即刻拍马上路。</p>
+<br />
+
+<h2 id="处理过程"><a href="#处理过程" class="headerlink" title="处理过程"></a>处理过程</h2><h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a><strong>初始化</strong></h3><p>你首先尝试完成 <strong>初始化</strong> 。虽然前面你有了链表的方案，但你更希望从最简单的 (实际上也是最常用的) 的数据形式入手，如果也能实现那当然更好。于是你采用了 0 到 $n - 1$ 的整数代表问题涉及的 $n$ 个元素，并以 <strong>数组</strong> 储存之。自然地，下标即代表元素，值为与该元素有 <strong>「等价」</strong> 关系的元素，效果上等于你之前链表想法中结点的 $next$ 指针 (引用) ，看起来能行。在亲戚关系中该等价关系为是否互为亲戚，在省份问题中等价关系为是否同属一省。对于省份问题，你创建了一个 $capital[]$ 数组 ( $capital$ 即省会，虽然对于城市 $i$， $capital[i]$ 是与 $i$ 在矩阵中有「联系」的城市， 不一定是省会，但你想不到更好的数组名，<strong>变量命名是你一生的课题</strong> ，暂时就这样吧)， $capital$ 大小为输入矩阵的一维长度，即城市数量。初始时，每个元素只知道 <strong>自己与自己「等价」</strong> ，因此创建这个数组后，遍历并使得 $capital[i] &#x3D; i$ 。这样初始化就完成了，看起来十分 OK👌。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 初始化</span></span><br><span class="line"><span class="type">int</span>[] capital = <span class="keyword">new</span> <span class="title class_">int</span>[isConnected.length];</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; isConnected.length; i++) &#123;</span><br><span class="line">    capital[i] = i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编写代码解题时，初始化过程可以在主方法中完成，也可以在并查集类 $UnionFind$ 的构造器中完成。你选择在构造器中完成初始化，并写下如下代码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>&#123;</span><br><span class="line">    <span class="comment">// 在主方法(findCycleNum)中new UnionFind</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">findCircleNum</span><span class="params">(<span class="type">int</span>[][] isConnected)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> isConnected.length;</span><br><span class="line">        <span class="type">UnionFind</span> <span class="variable">uf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UnionFind</span>(isConnected); <span class="comment">// 通过构造器完成初始化</span></span><br><span class="line">  </span><br><span class="line">        <span class="comment">// 求解过程 ???</span></span><br><span class="line">  </span><br><span class="line">        <span class="keyword">return</span> ???;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// UnionFind类，只写我们当前知道的。</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UnionFind</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span>[] capital;</span><br><span class="line">    <span class="comment">// 其他字段???</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">UnionFind</span><span class="params">(<span class="type">int</span>[][] isConnected)</span>&#123; <span class="comment">// 构造方法</span></span><br><span class="line">        <span class="built_in">this</span>.capital = <span class="keyword">new</span> <span class="title class_">int</span>[isConnected.length];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; isConnected.length; i++)&#123; </span><br><span class="line">            capital[i] = i;</span><br><span class="line">            <span class="comment">// 其他字段的初始化???</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接着你写了个输入矩阵，一共有 6 个城市 ${0, 1, 2, 3, 4, 5}$ ，<code>isConnected[i][j] = 1</code> 表示 $i$ 与 $j$ 为同一省。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 输入矩阵M</span><br><span class="line">&#123;</span><br><span class="line">&#123;1, 0, 0, 0, 1, 0&#125;, // 0-0, 0-4</span><br><span class="line">&#123;0, 1, 0, 0, 0, 1&#125;, // 1-1, 1-5</span><br><span class="line">&#123;0, 0, 1, 1, 0, 1&#125;, // 2-2, 2-3, 2-5</span><br><span class="line">&#123;0, 0, 1, 1, 0, 0&#125;, // 3-2, 3-3</span><br><span class="line">&#123;1, 0, 0, 0, 1, 0&#125;, // 4-0, 4-4</span><br><span class="line">&#123;0, 1, 1, 0, 0, 1&#125;, // 5-1, 5-2, 5-5</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>初始化后得到如下 5 个单元素集合。</p>
+<p><img src="https://pic.leetcode-cn.com/1652516047-sitcTa-image.png" alt="image.png"></p>
+<br />
+
+<h3 id="合并"><a href="#合并" class="headerlink" title="合并"></a><strong>合并</strong></h3><p>你现在开始尝试实现 <strong>合并方法 ($union$)</strong> 。在你设计的处理过程中已经写到，合并的依据是查询，你先假设自己已经实现了「查询」方法 $find(x)$ ，该方法返回 $x$ 的当前代表。合并 $x$ 和 $y$ 的前提是 <code>find(x) != find(y)</code> ，因为若 <code>find(x) == find(y)</code> ，说明二者已经在同一集合中了（同一省）。具体做法如下，对于 $x$，$y$ 两个城市，若 <code>find(x) != find(y)</code> ，就令 <code>capital[find(y)] = find(x)</code> ，当然也可以是 <code>capital[find(x)] = find(y)</code> ，选用其中一种即可。你一开始可能想要写成 <code>capital[x] = y</code>，但马上发现这么写只能表示 $y$ 是 $x$ 的代表，而你的目的是用 $y$ 目前的代表 ( $find(y)$ 的返回值) 来作为 $x$ 的代表 ( $find(x)$ 的返回值) 的代表，这样才能使得 $x$ 目前的集合 <strong>整体并入</strong> $y$ 所在的集合。</p>
+<p>到这你停顿了一下，又强调着提醒了一下自己，这里的「合并」并非真的把元素「静态地」装到了一个什么数据结构中，而是要通过 $find$ 才知道某个元素属于哪个集合，所以「合并 $x$ 与 $y$ 」就是「把 $y$ 所在集合合并到 $x$ 所在集合中」，也就是 <strong>「使 $y$ 所在树的根指向 $x$ 所在树的根」</strong> ，这样以后查询原 $y$ 所在集合的任意元素，指向原根后，会继续指向 $x$ 所在集合的根，也就知道此时这些元素已经合并到 $x$ 所在集合中了（在实现查询方法后你会有更深的体会）。合并方法就这么实现好了，并不复杂，你的信心开始上涌。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// union方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">union</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(find(x) != find(y))&#123;</span><br><span class="line">        capital[find(y)] = find(x); <span class="comment">// 令 x 的代表作为 y 的代表的代表</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 在main方法中遍历矩阵，调用union执行合并的过程的写法如下：</span></span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++)&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + <span class="number">1</span>; j &lt; n; j++)&#123;</span><br><span class="line">        <span class="keyword">if</span>(isConnected[i][j] == <span class="number">1</span>) uf.union(i, j);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>于是主方法扩充为如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>&#123;</span><br><span class="line">    <span class="comment">// 在主方法(findCycleNum)中new UnionFind</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">findCircleNum</span><span class="params">(<span class="type">int</span>[][] isConnected)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> isConnected.length;</span><br><span class="line">        <span class="type">UnionFind</span> <span class="variable">uf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UnionFind</span>(isConnected); <span class="comment">// 通过构造器完成初始化</span></span><br><span class="line">        <span class="comment">// 两个for，遍历矩阵完成合并</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + <span class="number">1</span>; j &lt; n; j++)&#123;</span><br><span class="line">                <span class="keyword">if</span>(isConnected[i][j] == <span class="number">1</span>) uf.union(i, j);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ???; <span class="comment">// 完成合并后我们已经完成求解，但现在还不知道该返回什么</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在你想试试这个合并方法能不能有效处理输入矩阵，并看看会「合并」成何种状态。为方便，你把前面的输入矩阵 $isConnected$ 再一次写在这里。 遍历前三行，你画出了遍历到 $isConnected[2][3]$ 和 $isConnected[2][5]$ 的状态（建议动手画一下，加深理解）。可以看到，遍历前三行后，就已经得到了最终的两个不相交集，所以对于这个输入，一共有两个省。</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 输入矩阵M</span><br><span class="line">&#123;</span><br><span class="line">&#123;1, 0, 0, 0, 1, 0&#125;, // 0-0, 0-4</span><br><span class="line">&#123;0, 1, 0, 0, 0, 1&#125;, // 1-1, 1-5</span><br><span class="line">&#123;0, 0, 1, 1, 0, 1&#125;, // 2-2, 2-3, 2-5</span><br><span class="line">&#123;0, 0, 1, 1, 0, 0&#125;, // 3-2, 3-3</span><br><span class="line">&#123;1, 0, 0, 0, 1, 0&#125;, // 4-0, 4-4</span><br><span class="line">&#123;0, 1, 1, 0, 0, 1&#125;, // 5-1, 5-2, 5-5</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当你画出 $union$ 的过程后，自然地发现，数据的结构呈现出 <strong>「树」</strong> 的形态，原先的单向链表的「尾结点」为树的 <strong>「根」</strong> ，但与通常的树不同，这里的链接关系是从孩子结点指向父结点。现在，你非常自然地将并查集结构从一开始的「单向链表」转换成了「树」。</p>
+<p>※ 作者按：我认为用树来理解不是特别重要，这个结构按链表理解完全没问题，一个「集合」也可以描述成一条或多条相交于尾结点的链表，「尾结点」等同于树中的「根」，后续出现的「树高」的概念也可以说是「最长链」的长度等等，只不过确实不如树的形象和树的语言描述来得方便。总之后续转换为树的语言来描述这里的「集合」）。</p>
+<p><img src="https://pic.leetcode-cn.com/1652516076-TZtQcS-image.png" alt="image.png"></p>
+<br />
+
+<h4 id="再谈合并语句"><a href="#再谈合并语句" class="headerlink" title="再谈合并语句"></a>再谈合并语句</h4><p>前面我们说到 $union(x,y)$ 是要将 $y$ (或 $x$ ) 所在树的根指向 $x$ (或 $y$ ) 所在树的根，因此要写成 <code>capital[find(y)] = find(x)</code> (或 <code>capital[find(x)] = find(y)</code> ) 。现在我们具体看看为什么 <code>capital[y] = x</code> 这样的写法为什么是错误的。如下所示的两个三元素集合，1 为 ${1,2,3}$ 的根，4 为  ${4,5,6}$ 的根。以 $capital[y] &#x3D; x$ 执行 $union(3, 5)$ ，那么两棵树会合并，合并后 $find(2)$ 和 $find(6)$ 查到的根分别是 1 和 4 ，所以当询问 2 和 6 是否在同一集合时会出错。读者朋友们可以把「小结」中的代码的 <code>capital[find(y)] = find(x)</code> 改成 <code>capital[y] = x</code> ，实际验证后会发现确实无法通过该题。</p>
+<pre><code>    1          4      
+   / \        / \
+  2   3  &lt;-  5   6    
+</code></pre>
+<br />
+
+<h3 id="查询"><a href="#查询" class="headerlink" title="查询"></a><strong>查询</strong></h3><p>你现在开始尝试实现 <strong>查询方法 ( $find$ 方法)</strong> 。之前已经说过，若集合以单向链表（暂时还用链表的语言描述）的形式组织，尾结点为集合代表 (省会)。那么查询应该是一个递归的过程，熟悉链表写法的你立即写出如下 <strong>尾递归</strong> 代码。</p>
+<p>※ 当然也可以用迭代来实现，这里采用递归方式实现，后续你会知道用递归而非迭代实现的好处。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 如果用链表组织集合，find可实现如下</span></span><br><span class="line"><span class="keyword">public</span> Node <span class="title function_">find</span><span class="params">(Node x)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(x.next == <span class="literal">null</span>) <span class="keyword">return</span> x;</span><br><span class="line">    <span class="keyword">return</span> find(x.next);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这相当理想，不过别忘了，虽然将集合想象成链表，但目前 $capital$ 是一个数组，要怎样沿着 $x$ 到找到它的代表元呢？如果做不到这一点你很可能要回到初始化推倒重来了。想到这里，你意识到要先思考此时该 <strong>如何找到代表元</strong> 。初始化单元素集合时，<code>capital[i] = i</code> ，如果此时合并 $i$ 和 $j$ ，令 <code>capital[find(j)] = find(i)</code> ，因为刚开始 <code>find(j) = j</code> ，<code>find(i) = i</code> ，所以这个合并其实就是 <code>capital[j] = i</code> ，并且要令此后 <code>find(j) = i</code> 。你发现，代表元的特点是 <code>find(i) = i</code> ，即自己指向自己，而非代表元 <code>find(j) = i</code>  ( $i$ 是 $j$ 的代表) 不具备这个特点。于是仿照前面链表的写法，你轻松写出如下 $find$ 方法。当 <code>capital[x] = x</code> 时，找到代表元，否则就找当前代表元的代表元，因为从 $x$ 到它的代表元，一定是串联在一条链上的，而对于尾结点 $t$ ，一定满足 <code>capital[t] = t</code> ，因此可以保证找到 $x$ 的代表元 $t$ 。可以看到，无论是 $union$ 还是 $find$ ，无论从理解上还是从实现上，都异常简单（这正是并查集的一大特色，短小精悍，以少量的代码完成高效的处理，你后续还会反复体会到这一点）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// find方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">find</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(capital[x] == x) <span class="keyword">return</span> x; <span class="comment">// 只有根节点满足capital[x] = x</span></span><br><span class="line">    <span class="keyword">return</span> find(capital[x]);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br />
+
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>至此你得到了<strong>基本的并查集实现</strong>，主要方法 $find$ 和 $union$ 都只有数行代码，十分简洁。你回顾了一下刚才的实现，写下如下概括性的总结。</p>
+<ul>
+<li><strong>初始化：</strong> 初始化代表下标 $i$ (城市 $i$ ) 的省会 ( $capital[i]$ ) 的 $capital$ 数组，一开始令 <code>capital[i] = i</code> 。</li>
+<li><strong>合并：</strong> 以查询为基础，$union(x, y)$ 将 $y$ 当前的代表元「指向」 $x$ 当前的代表元。</li>
+<li><strong>查询：</strong> 为尾递归方法，$find(x)$ 不断在链上沿着 $x$ 到它的代表元的方向前进，直到找到代表元(尾结点)。</li>
+</ul>
+<p>现在，你已经 <strong>「独立发明」</strong> 了基本并查集，写下如下代码，并验证了它确实能够解决省份问题，你感到一阵兴奋。</p>
+<p>※ 最终的省份数量可以在合并完成后对所有元素执行一次 $find(x)$ ，统计不同结果的个数得到。更聪明的做法是设置一个 <code>unionCount = 0</code> ，表示合并的次数，在 $union$ 方法内添加一行代码，使得发生合并时 <code>unionCount++</code> 实现累计，最后元素总数减去合并次数即为不相交集数量，也即省份数量。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Solution</span>&#123;</span><br><span class="line">    <span class="comment">// 在主方法(findCycleNum)中new UnionFind</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">findCircleNum</span><span class="params">(<span class="type">int</span>[][] isConnected)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> isConnected.length;</span><br><span class="line">        <span class="type">UnionFind</span> <span class="variable">uf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UnionFind</span>(isConnected); <span class="comment">// 通过构造器完成初始化</span></span><br><span class="line">        <span class="comment">// 两个for，遍历矩阵完成合并</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++)&#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> i + <span class="number">1</span>; j &lt; n; j++)&#123;</span><br><span class="line">                <span class="keyword">if</span>(isConnected[i][j] == <span class="number">1</span>) uf.union(i, j);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> n - uf.unionCount; <span class="comment">// 完成合并后我们已经完成求解，但现在还不知道该返回什么</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// UnionFind类，只写我们当前知道的。</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UnionFind</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span>[] capital;</span><br><span class="line">    <span class="type">int</span> <span class="variable">unionCount</span> <span class="operator">=</span> <span class="number">0</span>; <span class="comment">// 合并次数</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">UnionFind</span><span class="params">(<span class="type">int</span>[][] isConnected)</span>&#123; <span class="comment">// 构造器</span></span><br><span class="line">        <span class="built_in">this</span>.capital = <span class="keyword">new</span> <span class="title class_">int</span>[isConnected.length];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; isConnected.length; i++)&#123; </span><br><span class="line">            capital[i] = i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// union方法</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">union</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(find(x) != find(y))&#123;</span><br><span class="line">            capital[find(y)] = find(x);</span><br><span class="line">            unionCount++; <span class="comment">// 实时统计合并次数</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// find方法</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">find</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(capital[x] == x) <span class="keyword">return</span> x; <span class="comment">// 只有根节点满足capital[x] = x</span></span><br><span class="line">        <span class="keyword">return</span> find(capital[x]);  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>治学十分严谨的你开始研究目前的实现，并思考这一基本实现是否存在什么问题，或者有什么可以优化的地方。你首先从数据规模上考虑，若元素较多时，你发现将得到一条很长的链，对头节点查询其代表元时，需要遍历整条链。例如上述 ${1, 2, 3, 5}$ 这个集合，如果还有 ${6}, {7}, {8}$ 这三个单结点元素，且令  ${1, 2, 3, 5}$ 连续地与它们合并，即执行 $union(6, 5), union(7, 5), union(8, 5)$ 之后，得到如下。</p>
+<p>※ 对于本题，因为只需要遍历矩阵右上三角执行合并，因此 $union(x,y)$ 总有 $x &gt; y$ ， 上述 $union(6, 5), union(7, 5), union(8, 5)$ 实际上并不会执行，这么写只是为了引出后续内容而设置的假想情形。不过，在别的题目中，若 $union(x, y)$ 时， $x$ 总是一个单元素集合的话，是完全有可能出现链状树的。</p>
+<p><img src="https://pic.leetcode-cn.com/1652516119-xkUCfu-image.png" alt="image.png"></p>
+<p>你发现，简单直接的合并将导致较高的树，若再继续执行 $union(5, 9)$ ，首先进行的 $find(5)$ 将会依次向父节点方向查询 $1, 2, 6, 7, 8$ ，查询效率低下。设想，如果能将树的高度降低，例如除根节点外的所有节点直接挂在根节点下（ <strong>放射状</strong> ，或者也有人说是 <strong>菊花状</strong> ），那么 $find$ 的复杂度将为常数级，$union$ 也会因此变为常数级操作。基于这个思考，你将在下一节继续发明更好的求并方法，使得两棵树合并后得到的新树拥有更低的树高。</p>
+<br />
+
+<p><strong>补充说明：寻找等价关系</strong></p>
+<p>在省份数量问题中，矩阵已给出等价信息，使得我们可以直接遍历 $isConnected[i][j]$ ，根据其值是否为 1 来直接求并，但对于有的问题，开始时等价信息并不明显，需要先找到这样的等价关系，然后才能求并。例如 <a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-consecutive-sequence/">128: 最长连续序列</a> 问题，可以用并查集求解，但需要在开始时对 $i$ 和 $i+1$ 执行一次合并操作，这个「等价」是不太明显的。具体过程（代码）可参考后续内容。</p>
+<br />
+
+<h2 id="求并优化"><a href="#求并优化" class="headerlink" title="求并优化"></a>求并优化</h2><p>以目前的实现求解省份数量问题，你已经发现，合并 $x$ 和 $y$ 所在树 (集合) 时，只是简单地将 $y$ 所在树的根指向 $x$ 所在树的根 $capital[find(y)] &#x3D; find(x)$ ，最坏的情况下将得到一棵链状的树，较高的树高将导致较高的查询 (及合并) 复杂度。你希望以某种策略使合并后得到树高较小的树。几乎不费思忖，你就得到了一个自然的想法：在合并时，不再默认将  $y$  所在树 (的根) 挂到 $x$ 所在树 (的根) 上，而是先 <strong>比较这两棵树的大小</strong> ，让较小的树挂到较大的树上，因为 <strong>较小的树的树高总是倾向于较低</strong> 。如果较小的那棵树低于较大的那棵树，合并后树高不变！你迫不及待继续码起来。</p>
+<br />
+
+<h3 id="按大小求并"><a href="#按大小求并" class="headerlink" title="按大小求并"></a>按大小求并</h3><p>现在，你尝试实现这种 <strong>「按大小求并」</strong> 的做法。这很简单，只需要在合并前比较两棵树的大小即可，如下，「按大小求并」的 $union$ 方法对你来说就是「分分钟」（此时你已经有点膨胀了，不过作为并查集发明人，倒也不为过）。（为了从更广泛的意义上描述，此后不再特别强调「省份数量」问题，且把 $capital$ 数组改为更一般的 $parent$ 数组，表示父结点。）</p>
+<p>※ 用 $parent$ 而不是 $father$ ，就像说孩子结点而不是儿子结点，用 $child$ 而不是 $son$ ，都是名称上的性别正义，不过中文语境中很少说“亲结点”，因此还是描述为父结点。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Union方法：按大小求并</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">union</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span>&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">xRoot</span> <span class="operator">=</span> find(x), yRoot = find(y);</span><br><span class="line">    <span class="comment">// 根节点不同才求并</span></span><br><span class="line">    <span class="keyword">if</span>(xRoot != yRoot) &#123;</span><br><span class="line">        <span class="keyword">if</span>(size[yRoot] &lt;= size[xRoot])&#123; <span class="comment">// 当y所在树大小小于等于x所在树大小时</span></span><br><span class="line">            parent[yRoot] = xRoot; <span class="comment">// 将yRoot挂在xRoot上</span></span><br><span class="line">            size[xRoot] += size[yRoot]; <span class="comment">// 更新x所在树的大小</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            parent[xRoot] = yRoot;</span><br><span class="line">            size[yRoot] += size[xRoot];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你新增了一个与 $parent$ 大小相同的 $size$ 数组，$size[i]$ 表示 $i$ 结点所在树的大小。$UnionFind$ 类中需要添加 $size$ 数组字段和相应的初始化内容（单结点集合的大小为 1）。如下代码在构造器中初始化树大小数组 $size []$ 。补充后如下，并且你稍微修改了构造器的入参，不是以矩阵为入参，而是以一维数组为入参， $parent$ 数组的初始化改为写在主方法中。因为你觉得这样有利于使 $UnionFind$ 类的写法统一且稳定，不必总是对不同问题进行调整。你对这一修改还算满意。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 初始化</span></span><br><span class="line"><span class="type">int</span>[] parent = <span class="keyword">new</span> <span class="title class_">int</span>[isConnected.length];</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; isConnected.length; i++) &#123;</span><br><span class="line">    parent[i] = i;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">UnionFind</span> <span class="variable">uf</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UnionFind</span>(parent);</span><br><span class="line"></span><br><span class="line"><span class="comment">// UnionFind类(部分)</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UnionFind</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span>[] parent, size; <span class="comment">// size保存树的大小</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">UnionFind</span><span class="params">(<span class="type">int</span>[] parent)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.parent = parent;</span><br><span class="line">        <span class="built_in">this</span>.size = <span class="keyword">new</span> <span class="title class_">int</span>[parent.length];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; parent.length; i++) &#123;</span><br><span class="line">            <span class="built_in">this</span>.size[i] = <span class="number">1</span>; <span class="comment">// 初始时单节点树大小为1</span></span><br><span class="line">        &#125; <span class="comment">// 或者 Arrays.fill(size, 1);</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>按大小求并的方法就这样实现出来了。不过在欣赏这个实现之余，你难免会回想自己当初 <strong>为何出发</strong> ，起初你希望合并后的树拥有较低的树高，但是一棵大小较小的树完全有可能高于大小较大的树，比如链状树在结点较少时也很容易高于菊花树。那为何不直接按高度求并呢？而且按高度求并还有一个好处，新树的高度变化只发生在两棵树高度相等时，此时高度加 1 ，而按大小求并时，每次合并都要修改新树的大小。沿着这个想法，下一节你将继续发明 <strong>「按高度求并」</strong>。</p>
+<br />
+
+<h3 id="按秩-高度-求并"><a href="#按秩-高度-求并" class="headerlink" title="按秩(高度)求并"></a>按秩(高度)求并</h3><p>不是「按高度求并」吗，怎么还有个 <strong>「秩 ( $rank$ ) 」</strong> ？现说明如下，但该说明的内容你只能在下一节发明「路径压缩」后才会理解，此处按下不表，你可以先将「秩 ( $rank$ )」暂时等同于「高度 ( $height$ ) 」。</p>
+<blockquote>
+<p>当并查集的查找方法不具有「带路径压缩」的效果时，本节所述方法就是严格的「按高度求并」。</p>
+<p>当并查集应用了「带路径压缩」的查找方法时，$height$ 将不能表示严格的「树高」的概念，为严谨，需改称「按高度求并」为「按秩求并」。</p>
+</blockquote>
+<p>类似「按大小求并」的做法，你立即写出「按秩 (高度) 求并」的如下方法（初始化 $rank$ 数组写法与 $size$ 数组一致，此处省略。另外下面代码的写法有点不规范，括号内单行语句的情况你都省略了括号，不过你并不是很在意，心想规范个腿，我没写成一行算客气的了）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// union方法：按秩(高度)求并，先判断是否在同一集合</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">union</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span>&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">xRoot</span> <span class="operator">=</span> find(x), yRoot = find(y);</span><br><span class="line">    <span class="keyword">if</span>( xRoot != yRoot)&#123;</span><br><span class="line">        <span class="keyword">if</span>(rank[yRoot] &lt;= rank[xRoot]) parent[yRoot] = xRoot;</span><br><span class="line">        <span class="keyword">else</span> parent[xRoot] = yRoot;</span><br><span class="line">        <span class="keyword">if</span>(rank[xRoot] == rank[yRoot]) rank[xRoot]++; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你敏锐地发现还可以有一种去掉 <code>if(xRoot != yRoot)</code> 判断的写法。因为你发现即便 <code>xRoot == yRoot</code> ，根据 <code>rank[xRoot] == rank[yRoot]</code> ，将执行  <code>parent[yRoot] = xRoot</code> ，仍是根结点指向自己，并未改变什么。在不同集合元素求并操作较多时，这样做可以节省一点 <code>xRoot != yRoot</code> 判断的时间。当然，这并不重要，你只是想多展现一些不同的写法。你还注意到，采用这种写法后，在决定是否要增加秩 (树高) 时，要判断是否有 <code>xRoot != yRoot</code> 。即当两棵树秩 (高度) 相等且为不同集合时，新树的秩 (高度) 加 1。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// union方法：按秩(高度)求并，不判断是否在同一集合</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">union</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span>&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">xRoot</span> <span class="operator">=</span> find(x), yRoot = find(y);</span><br><span class="line">    <span class="keyword">if</span>(rank[yRoot] &lt;= rank[xRoot]) parent[yRoot] = xRoot;</span><br><span class="line">    <span class="keyword">else</span> parent[xRoot] = yRoot;</span><br><span class="line">    <span class="keyword">if</span>(rank[xRoot] == rank[yRoot] &amp;&amp; xRoot != yRoot)&#123;</span><br><span class="line">        rank[xRoot]++; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>秩 (高度) 较小的树的秩 (高度) 无需更新，因为每次求一个元素所在集合的高度都会先找到该集合的树的根，秩 (高度) 较小的树在合并后其树根在新树中就不是树根了。这一点你当然了若于胸。</p>
+<p>现在你回过头重新审视前述导致树高较高的基本合并方法，并尝试使用优化的「按秩 (高度) 合并」方法看看效果。对于 ${1, 2, 3, 5}$ 集合，连续地合并它与单节点集合 ${6}, {7}, {8}$ ，即执行 $union(6, 5), union(7, 5), union(8, 5)$ ，在应用按秩 (高度) 求并之后，得到如下。</p>
+<p><img src="https://pic.leetcode-cn.com/1652516172-rTFJLD-image.png" alt="image.png"></p>
+<p>效果十分理想。但结点 5 显得异常扎眼，如果能将节点 5 也直接连到根节点 2 下，将得到最完美的高度为 2 的树。这是否能做到呢？一番踌躇后，你发现在 $union$ 方法中无法做到这一点，因为 $union$ 的作用只是让一个树根指向另一个树根。那 $find$ 方法能实现吗？勤学好问的你继续逼问自己，并想到 $find(5)$ 从 5 沿着父结点方向走向根，看起来可以在这个过程中做些文章。于是，你再接再厉，在下一节中继续这一优化。如果实现该优化，将使得 5 到根结点 2 的路径缩短，因此你在这里提前把这个优化命名为 <strong>「路径压缩」</strong>，优化后的 $find$ 方法称作 <strong>「带路径压缩的查找」</strong>。</p>
+<br />
+
+<h2 id="路径压缩"><a href="#路径压缩" class="headerlink" title="路径压缩"></a>路径压缩</h2><p>前面提到，在 $find(5)$ 时，如果能在查询过程中将 5 的父结点改为 2，就完成了「路径压缩」，熟悉递归的你立刻感觉到这很容易，只需在 $find$ 方法中修改一行代码，就可以让 $find$ 在查询根节点的同时执行这个「压缩」的操作。于是你写下如下代码，改动了 $return$ 语句，将递归的 $find[parent[x]]$ 赋值给 $parent[x]$ ，如下。略作推敲，你肯定该写法正确无误，可以让 <strong>当前查找的节点到根节点路径上所有的节点都指向根节点</strong> 。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// find方法：带路径压缩</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">find</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(parent[x] == x) <span class="keyword">return</span> x;</span><br><span class="line">    <span class="keyword">return</span> parent[x] = find(parent[x]);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你继续审视前述按秩 (高度) 合并的扎眼的 5 ，在更新了「带路径压缩」的 $find$ 方法后，重新执行一次 $union$ 看下会发生什么。对 ${1, 2, 3, 5}$ 集合，连续地与单节点集合 ${6}, {7}, {8}$ 合并。首先执行 $union(6, 5)$ ，方法内会执行 $find(5)$ 来查找5的根结点，在带路径压缩的 $find$ 中，5 在寻找其所在树的根节点的过程中，<strong>实时地令其到根节点路径上的所有节点都指向了根节点</strong>，于是原路径被压缩，继续合并 ${7}$ 和 ${8}$ 之后你画出下图。</p>
+<p><img src="https://pic.leetcode-cn.com/1652516194-NgIHxD-image.png" alt="image.png"></p>
+<p>终于得到了一棵对于查询 (以及合并) 来说最完美的树，心情不错的你为防万一，又检查了一遍实现过程，并有一个 <strong>不大不小中发现</strong> 。5 指向 2 发生在 $union(6, 5)$ 时 (其内调用 $find(5)$ ) ， $find$ 方法不会修改树的高度，「压缩」前后 $rank[2]$ 保持不变，即 $rank[2] &#x3D; 3$ ，但经过 $find$ 的压缩，树的高度已经变为 2 了。这时你突然有所领悟，<strong>原来这就是称做「按秩求并」而非「按高度求并」原因</strong>。一声「なるほど」之后你快速写下如下总结（「好记忆不如烂笔头」是你小学三年级的座右铭，你还把这句话刻在了书桌右上角）：</p>
+<blockquote>
+<p>「按秩求并」而非「按高度求并」：</p>
+<p>在应用带路径压缩的查询和按秩求并后，$rank[root]$ 记录的数字是树实际高度的一个上界，树的实际高度可能小于此值。</p>
+</blockquote>
+<p>对于「秩 ( $rank$ )」，你还有这样的思考: 按高度求并的优化原本是用「高度 ( $height$ )」来指导树的合并，但因为 <strong>「同时」</strong> 应用了 「路径压缩」 优化，导致程序记录的 $height$ 信息不再是严格定义下的「高度」，这就好像树高被 $find$ 给压缩了，但 $height$ 这个变量没察觉到这个变化，导致 $height$ 不再能表达「真实高度」。因此为了严谨，我们不能再使用 $height$ 这个单词 (这个概念) ，转而采用另一个词 (另一个概念) 来指代此时的「高度」。找啊找，发现 $rank$ 这个单词很合适。中文的「秩」是「$rank$」这个词的翻译，就是我们理解的「排名」那样，指一种「不精确的突出相对意味的大小」，Webster 词典对 $rank$ 的第一条释义为: <em>relative standing or position</em>。你当然也可以选择别的词来形容，比如 almost height, rough height 之类的，只不过都不如 $rank$ 更合适。</p>
+<p>至此，你完成了一个中等偏大的成就：先是独立发明基本并查集，再通过观察树的形态发现优化方向，主动提出优化方案，并最终实现了两种求并优化（「按大小求并」和「按秩求并」）和一种查询优化（「带路径压缩的查询」）。你略感激动，但也没有四下声张，只是把尚未完稿的文章分享给了一个朋友，还顺手编辑了一张喵喵表情，「并查集，就这？就这？」。</p>
+<p>※ Webster词典中给出的 「$rank$ (秩) 」 一词的释义。</p>
+<p><img src="https://pic.leetcode-cn.com/1654406088-kLYvfW-image.png" alt="image.png"></p>
+<br />
+
+<h2 id="类的实现代码"><a href="#类的实现代码" class="headerlink" title="类的实现代码"></a>类的实现代码</h2><p>现在你作为并查集发明人，继续总结如下内容。</p>
+<p>通过上述对实际问题处理过程的讲解，我们已经给出了能够处理集合代表元查询及合并问题的并查集数据结构。在按大小或按秩求并时，需要保存大小或秩 (高度) 信息的数组。现给出如下包含 <strong>直接求并，按大小求并，按秩求并，直接查询，带路径压缩查询</strong> 等方法的实现。实际使用时只需按需选择一种求并和一种查询方法即可，<strong>按秩求并 + 带路径压缩查询</strong> 的组合在多数情况下因其效率更高而成为首选。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">UnionFind</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span>[] parent, rank, size; <span class="comment">// 实际代码中，按秩求并和按大小求并选择其一</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">UnionFind</span><span class="params">(<span class="type">int</span>[] parent)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.parent = parent;</span><br><span class="line">        <span class="built_in">this</span>.rank = <span class="keyword">new</span> <span class="title class_">int</span>[parent.length];</span><br><span class="line">        <span class="built_in">this</span>.size = <span class="keyword">new</span> <span class="title class_">int</span>[parent.length];</span><br><span class="line">        Arrays.fill(rank, <span class="number">1</span>); <span class="comment">// 实际代码中，按秩求并和按大小求并选择其一</span></span><br><span class="line">        Arrays.fill(size, <span class="number">1</span>); <span class="comment">// 实际代码中，按秩求并和按大小求并选择其一</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 直接查找</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">findDirect</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(parent[x] == x) <span class="keyword">return</span> x;</span><br><span class="line">        <span class="keyword">return</span> findDirect(parent[x]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 带路径压缩的查找</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">find</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(parent[x] == x) <span class="keyword">return</span> x;</span><br><span class="line">        <span class="keyword">return</span> parent[x] = find(parent[x]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 直接求并</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">unionDirect</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">xRoot</span> <span class="operator">=</span> find(x), yRoot = find(y);</span><br><span class="line">        <span class="keyword">if</span>(xRoot != yRoot)&#123;</span><br><span class="line">            parent[yRoot] = xRoot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 按大小求并</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">unionBySize</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span>&#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">xRoot</span> <span class="operator">=</span> find(x), yRoot = find(y);</span><br><span class="line">        <span class="keyword">if</span>(xRoot != yRoot) &#123; <span class="comment">// 根节点不同才求并</span></span><br><span class="line">            <span class="keyword">if</span>(size[yRoot] &lt;= size[xRoot])&#123;</span><br><span class="line">                parent[yRoot] = xRoot;</span><br><span class="line">                size[xRoot] += size[yRoot];</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                parent[xRoot] = yRoot;</span><br><span class="line">                size[yRoot] += size[xRoot];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 按秩求并</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">union</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span>&#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">xRoot</span> <span class="operator">=</span> find(x), yRoot = find(y);</span><br><span class="line">        <span class="keyword">if</span>( xRoot != yRoot)&#123;</span><br><span class="line">            <span class="keyword">if</span>(rank[yRoot] &lt;= rank[xRoot]) &#123;</span><br><span class="line">                parent[yRoot] = xRoot;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                parent[xRoot] = yRoot;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(rank[xRoot] == rank[yRoot]) &#123;</span><br><span class="line">                rank[xRoot]++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br />
+
+<p><strong>无需大小&#x2F;秩数组空间的技巧</strong></p>
+<p>你还在一本书上学到一种技巧，并搬运到了自己的教程上。如果元素的表示不涉及负数（通常如此）的话，可以用一个小技巧来节省大小或秩数组的开销。在以前的说明中，初始化集合时，我们令每一个元素的父节点指向自己，即 <code>parent[x] = x</code> ，表示这是根节点。本技巧以 <code>parent[x] &lt; 0</code> 表示根节点，初始时所有结点不再指向自己，而是置为 -1 ，即 <code>parent[i] = -1</code> 。这样的可行之处在于，$find(x)$ 会一直递归找到根，除了根的 $parent[root]$ 为负数，其他元素 $y$ 的 $parent[y]$ 都是真实存在的父结点的下标，下标自然是非负数。需要注意的是，因其为负数，在两棵树比较大小或秩(高度)时，值越小，则大小或秩 (高度) 越大。在按大小求并时， $size[root]$ 的更新方法不变，但在按秩 (高度) 求并时，新树高度增高 1 时需令 <code>rank[root]--</code> 。</p>
+<p>应用此技巧，给出如下完整实现。同样地，实际使用时只需按需选择一种求并和一种查询方法即可。</p>
+<p>※ 此技巧学习自Weiss的 <a target="_blank" rel="noopener" href="https://awesome-programming-books.github.io/algorithms/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E5%88%86%E6%9E%90%EF%BC%9AJava%E8%AF%AD%E8%A8%80%E6%8F%8F%E8%BF%B0.pdf">数据结构与算法分析：Java语言描述</a> 。另外，在不用负数技巧的版本中，由于根节点相同不影响结果，考虑到在不同集合元素求并操作较多时，在 $union$ 方法中可以省去 <code>xRoot != yRoot</code> 的判断。这个版本中，必须要执行 <code>xRoot != yRoot</code> 的判断，否则当两个同集合元素比较时，将使得 <code>parent[xRoot] = xRoot</code> ，也即原为一个负数的 <code>parent[xRoot]</code> 的值变成了一个非负数 ( $xRoot$ ) ，将导致程序错误。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 应用负数技巧的并查集</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">UnionFind2</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span>[] parent;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">UnionFind2</span><span class="params">(<span class="type">int</span>[] parent)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.parent = parent;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 直接查找</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">findDirect</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(parent[x] &lt; <span class="number">0</span>) <span class="keyword">return</span> x; <span class="comment">// 只有代表元满足 parent[x] &lt; 0</span></span><br><span class="line">        <span class="keyword">return</span> findDirect(parent[x]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 带路径压缩的查找</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">find</span><span class="params">(<span class="type">int</span> x)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(parent[x] &lt; <span class="number">0</span>) <span class="keyword">return</span> x;</span><br><span class="line">        <span class="keyword">return</span> parent[x] = find(parent[x]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 直接求并</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">unionDirect</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">xRoot</span> <span class="operator">=</span> find(x), yRoot = find(y);</span><br><span class="line">        <span class="keyword">if</span>(xRoot != yRoot)&#123;</span><br><span class="line">            parent[yRoot] = xRoot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 按大小求并</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">unionBySize</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span>&#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">xRoot</span> <span class="operator">=</span> find(x), yRoot = find(y);</span><br><span class="line">        <span class="keyword">if</span>(xRoot != yRoot) &#123; <span class="comment">// 根节点不同才求并</span></span><br><span class="line">            <span class="keyword">if</span>(parent[xRoot] &lt;= parent[yRoot])&#123; <span class="comment">// 负数比较，较小者树较大，xRoot所在树更大(或相等)</span></span><br><span class="line">                parent[xRoot] += parent[yRoot]; <span class="comment">// 更新树的大小</span></span><br><span class="line">                parent[yRoot] = xRoot;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                parent[yRoot] += parent[xRoot];</span><br><span class="line">                parent[xRoot] = yRoot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 按秩求并</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">union</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y)</span>&#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">xRoot</span> <span class="operator">=</span> find(x), yRoot = find(y);</span><br><span class="line">        <span class="keyword">if</span>(xRoot != yRoot) &#123;</span><br><span class="line">            <span class="keyword">if</span>(parent[xRoot] &lt; parent[yRoot])&#123; <span class="comment">// xRoot所在树秩更大，yRoot挂到xRoot之下</span></span><br><span class="line">                parent[yRoot] = xRoot;</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span>(parent[xRoot] &gt; parent[yRoot])&#123; <span class="comment">// yRoot所在树秩更大，xRoot挂到yRoot之下</span></span><br><span class="line">                parent[xRoot] = yRoot;</span><br><span class="line">            &#125; <span class="keyword">else</span>&#123; <span class="comment">// 秩等大，yRoot挂到xRoot之下</span></span><br><span class="line">                parent[xRoot]--; <span class="comment">// xRoot所在树秩加1 (负数，实际减1)</span></span><br><span class="line">                parent[yRoot] = xRoot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br />
+
+<h2 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h2><p>这个部分你终于感到力有不逮，严格的 <a target="_blank" rel="noopener" href="https://oi-wiki.org/ds/dsu-complexity/">复杂度证明</a> 你看了八遍，最终选择放弃，暂时只能写下如下内容（但你在行文中假装自己知道什么是 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Ackermann_function">反阿克曼函数</a> ）。</p>
+<p>时间复杂度：严格的分析很复杂，省略。带路径压缩的按秩求并的并查集，其查询与合并操作的时间复杂度均为 $O(α(n))$ ( $α(n)$ 表示增长十分缓慢的反阿克曼函数)，对于任何实际的问题的 $n$ ，$α(n)$ 不会超过 5 。因此可以认为此复杂度为 $O(1)$ 。初始化 $parent[] &#x2F; size[] &#x2F; rank[]$  数组的时间复杂度为 $O(n)$ 。</p>
+<p>空间复杂度：取决于 $parent[] &#x2F; size[] &#x2F; rank[]$ 数组所占空间，为 $O(n)$ 。</p>
+<br />
+
+<h2 id="实战应用"><a href="#实战应用" class="headerlink" title="实战应用"></a>实战应用</h2><p>在「处理过程」中介绍了应用不相交集处理问题的通用过程，如下一些例题中我们将看到，对于不同的具体问题，各步骤的应用是灵活的。</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-consecutive-sequence/">128.最长连续数列</a>。只需在 $find()$ 时以路径压缩方式合并，除给定初始时的等价关系用到主动合并(直接求并)外，不再调用 $union$ 。</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-provinces/">547.省份数量</a>。等价关系在输入矩阵中是明显的，只需在 <code>isConnected[i][j] = 1</code> 时主动合并 $union(i, j)$ 即可，$find()$ 中可以不带合并 (路径压缩)，当然也可以带路径压缩以提高效率。</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-islands/">200.岛屿数量</a>。与省份数量问题的输入都是矩阵，但岛屿数量问题的初始时单节点元素是矩阵中的每一个 “1”，而省份数量问题是列(或行)中的每一个元素。</li>
+<li><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/evaluate-division/">399. 除法求值</a> 和 <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-minimum-effort/">1631. 最小体力消耗路径</a> 的并查集解法需要一定的问题抽象能力。</li>
+</ol>
+<p>以下题目的并查集解法都十分经典，如果你能够想到应用并查集，应用本文介绍的内容，解题应当是轻松愉快的。也一并给出题解，供读者朋友们自练自查。</p>
+<table>
+<thead>
+<tr>
+<th>题目</th>
+<th>难度</th>
+<th>题解</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-connected-components-in-an-undirected-graph/">323. 无向图中连通分量的数目</a></td>
+<td>中等</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-connected-components-in-an-undirected-graph/solution/by-yukiyama-y5l4/">题解</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-provinces/">547.省份数量</a></td>
+<td>中等</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-provinces/solution/by-yukiyama-mh7f/">题解</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/number-of-islands/">200.岛屿数量</a></td>
+<td>中等</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-islands/solution/by-yukiyama-jkd6/">题解</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/max-area-of-island/">695. 岛屿的最大面积</a></td>
+<td>中等</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/max-area-of-island/solution/by-yukiyama-0mrt/">题解</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/is-graph-bipartite/">785. 判断二分图</a></td>
+<td>中等</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/is-graph-bipartite/solution/by-yukiyama-yoc0/">题解</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/redundant-connection/">684. 冗余连接</a></td>
+<td>中等</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/redundant-connection/solution/-by-yukiyama-mlqi/">题解</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-consecutive-sequence/">128.最长连续数列</a></td>
+<td>中等</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/longest-consecutive-sequence/solution/by-yukiyama-e3th/">题解</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/similar-string-groups/">839. 相似字符串组</a></td>
+<td>困难</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/similar-string-groups/solution/by-yukiyama-j3dt/">题解</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/evaluate-division/">399. 除法求值</a></td>
+<td>中等</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/evaluate-division/solution/yukiyama-by-yukiyama-geql/">题解</a></td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-minimum-effort/">1631. 最小体力消耗路径</a></td>
+<td>中等</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-minimum-effort/solution/yukiyama-by-yukiyama-qboz/">题解</a></td>
+</tr>
+<tr>
+<td>&#x3D;&#x3D;&#x3D;&#x3D; 持续更新中 &#x3D;&#x3D;&#x3D;&#x3D;</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<br />
+
+<p>🐮🐮🐮<br>牛啊，你竟然真的看到这里了。</p>
+<hr>
+<p><strong>文章更新日志</strong></p>
+<p>[2022-06-11]</p>
+<ul>
+<li>「实战应用」中新增「<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/number-of-connected-components-in-an-undirected-graph/">323. 无向图中连通分量的数目</a>」的并查集题解。</li>
+<li>优化文章可读性，新增若干补充说明。</li>
+</ul>
+<p>[2022-06-05]</p>
+<ul>
+<li>「实战应用」中新增「<a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-minimum-effort/">1631. 最小体力消耗路径</a>」的并查集题解。</li>
+<li>修改了「实战应用」的展现方式，不再在本帖中直接贴出题解，而以表格形式罗列，给出题解链接。</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="https://iyukiyama.github.io">yukiyama</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="https://iyukiyama.github.io/2022/06/10/%E5%B9%B6%E6%9F%A5%E9%9B%86%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%87%BA%E9%97%A8/">https://iyukiyama.github.io/2022/06/10/%E5%B9%B6%E6%9F%A5%E9%9B%86%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%87%BA%E9%97%A8/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"><div class="social-share" data-image="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/06/15/%E5%9B%BE%E8%AE%BA%E7%AE%97%E6%B3%95%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E4%B8%8B/"><img class="prev-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">图论算法从入门到放下</div></div></a></div><div class="next-post pull-right"><a href="/2022/06/08/%E5%8D%81%E5%A4%A7%E6%8E%92%E5%BA%8F%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E5%85%A5%E8%B5%98/"><img class="next-cover" src="https://pic.leetcode-cn.com/1652691519-SVKUkM-image.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">十大排序从入门到入赘</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">yukiyama</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">1</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/iyukiyama" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:iyukiyama@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8A%E5%A4%A9%EF%BC%8C%E5%B0%B1%E7%94%B1%E4%BD%A0%E6%9D%A5%E5%8F%91%E6%98%8E%E5%B9%B6%E6%9F%A5%E9%9B%86"><span class="toc-number">1.</span> <span class="toc-text">今天，就由你来发明并查集</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="toc-number">1.1.</span> <span class="toc-text">基本概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B"><span class="toc-number">1.2.</span> <span class="toc-text">处理过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-number">1.2.1.</span> <span class="toc-text">初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%88%E5%B9%B6"><span class="toc-number">1.2.2.</span> <span class="toc-text">合并</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%8D%E8%B0%88%E5%90%88%E5%B9%B6%E8%AF%AD%E5%8F%A5"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">再谈合并语句</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2"><span class="toc-number">1.2.3.</span> <span class="toc-text">查询</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">1.2.4.</span> <span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B1%82%E5%B9%B6%E4%BC%98%E5%8C%96"><span class="toc-number">1.3.</span> <span class="toc-text">求并优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%89%E5%A4%A7%E5%B0%8F%E6%B1%82%E5%B9%B6"><span class="toc-number">1.3.1.</span> <span class="toc-text">按大小求并</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%89%E7%A7%A9-%E9%AB%98%E5%BA%A6-%E6%B1%82%E5%B9%B6"><span class="toc-number">1.3.2.</span> <span class="toc-text">按秩(高度)求并</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%AF%E5%BE%84%E5%8E%8B%E7%BC%A9"><span class="toc-number">1.4.</span> <span class="toc-text">路径压缩</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81"><span class="toc-number">1.5.</span> <span class="toc-text">类的实现代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="toc-number">1.6.</span> <span class="toc-text">复杂度分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8"><span class="toc-number">1.7.</span> <span class="toc-text">实战应用</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2022/09/14/%E7%BA%A2%E9%BB%91%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%9C%8B%E5%BC%80/" title="红黑树从入门到看开"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="红黑树从入门到看开"/></a><div class="content"><a class="title" href="/2022/09/14/%E7%BA%A2%E9%BB%91%E6%A0%91%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E7%9C%8B%E5%BC%80/" title="红黑树从入门到看开">红黑树从入门到看开</a><time datetime="2022-09-14T10:32:06.989Z" title="Created 2022-09-14 18:32:06">2022-09-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/09/01/git%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/" title="Git学习实战"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Git学习实战"/></a><div class="content"><a class="title" href="/2022/09/01/git%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/" title="Git学习实战">Git学习实战</a><time datetime="2022-08-31T16:10:22.004Z" title="Created 2022-09-01 00:10:22">2022-09-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/08/31/Maven%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/" title="Maven学习实战"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Maven学习实战"/></a><div class="content"><a class="title" href="/2022/08/31/Maven%E5%AD%A6%E4%B9%A0%E5%AE%9E%E6%88%98_yukiyama/" title="Maven学习实战">Maven学习实战</a><time datetime="2022-08-31T13:35:23.475Z" title="Created 2022-08-31 21:35:23">2022-08-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/08/17/splay%E6%A0%91/" title="splay树"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="splay树"/></a><div class="content"><a class="title" href="/2022/08/17/splay%E6%A0%91/" title="splay树">splay树</a><time datetime="2022-08-17T03:19:44.141Z" title="Created 2022-08-17 11:19:44">2022-08-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2022/08/17/AVL%E6%A0%91/" title="AVL树"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="AVL树"/></a><div class="content"><a class="title" href="/2022/08/17/AVL%E6%A0%91/" title="AVL树">AVL树</a><time datetime="2022-08-17T02:57:15.979Z" title="Created 2022-08-17 10:57:15">2022-08-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By yukiyama</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
